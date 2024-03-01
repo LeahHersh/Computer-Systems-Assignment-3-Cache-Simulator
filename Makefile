@@ -5,11 +5,10 @@ CFLAGS = $(CONSERVATIVE_FLAGS) $(DEBUGGING_FLAGS)
 
 
 csim: main.o
-	$(GCC) -o csim $<
+	$(GCC) -o csim $^
 
 main.o: main.cpp
 	$(GCC) -c main.cpp
-
 
 clean:
 	rm -f *.o *~
