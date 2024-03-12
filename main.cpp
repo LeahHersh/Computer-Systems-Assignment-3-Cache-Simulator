@@ -11,6 +11,7 @@
 
 int main(int argc, char *argv[]) {
     Cache cache;
+    int sim_time = 0;
 
     // Assign command-line arguments to variables
     int num_sets = int(argv[0]);
@@ -32,7 +33,7 @@ int main(int argc, char *argv[]) {
 
     // Determine if cache is direct-mapped
     bool direct_mapped = false;
-    if (num_sets == 1) {
+    if (blocks_per_set == 1) {
       direct_mapped = true;
     }
 
@@ -57,7 +58,45 @@ int main(int argc, char *argv[]) {
         std::string ignored;
         ss >> load_or_store >> memory_address >> ignored;
 
-        
+        if (direct_mapped) {
+          int num_offset_bits = log2(block_size);
+          int num_index_bits = log2(num_sets);
+          int num_tag_bits = 32 - num_offset_bits - num_index_bits;
+
+          // Find the memory address's index
+          uint32_t address_index = (stoi(memory_address) >> num_offset_bits) & (1 << num_index_bits - 1);
+          // Find the memory address's tag
+          uint32_t address_tag = (stoi(memory_address) >> num_offset_bits >> num_index_bits) & (1 << num_tag_bits - 1);
+          
+          Slot curr_slot = cache.sets[address_index].slots[0];
+          if (load_or_store == "l") {  
+            // If the current slot is valid and has the same tag as the memory address
+            if (curr_slot.valid && (curr_slot.tag == address_tag)) {
+              // The load is successful
+              load_hits++;
+              // Otherwise, it's a miss
+            } else {
+              load_misses++;
+            }
+            curr_slot.update_load_ts(sim_time);
+
+          // If a store is being attempted
+          } else {
+              // If the current slot is valid and has the same tag as the memory address
+            if (curr_slot.valid && (curr_slot.tag == address_tag)) {
+              // The load is successful
+              store_hits++;
+              // Otherwise, it's a miss
+            } else {
+              store_misses++;
+            }
+          }
+
+          // Update access time regardless of if a load or store happened
+          curr_slot.update_access_ts(sim_time);
+        }
+
+      sim_time++;
     }
 }
 
