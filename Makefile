@@ -6,10 +6,10 @@ LIBS += -lm
 
 
 csim: main.o
-	$(CXX)$(CFLAGS) -o csim $^ $(LIBS)
+	$(CXX) $(CFLAGS) -o csim $^ $(LIBS)
 
 main.o: main.cpp
-	$(CXX)$(CFLAGS) -c main.cpp
+	$(CXX) $(CFLAGS) -c main.cpp
 
 clean:
 	rm -f *.o *~
