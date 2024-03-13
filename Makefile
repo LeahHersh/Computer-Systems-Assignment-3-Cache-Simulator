@@ -1,5 +1,5 @@
 CC = g++
-CONSERVATIVE_FLAGS = -std=c99 -Wall -Wextra -pedantic
+CONSERVATIVE_FLAGS = -Wall -Wextra -pedantic
 DEBUGGING_FLAGS = -g -O0
 CFLAGS = $(CONSERVATIVE_FLAGS) $(DEBUGGING_FLAGS)
 LIBS += -lm

@@ -8,7 +8,6 @@
 #include <sstream>
 
 int main(int argc, char *argv[]) {
-    Cache cache;
     int sim_time = 0;
 
     // Assign command-line arguments to variables
@@ -28,6 +27,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Initialize cache
+    Cache cache;
     cache.sets.resize(num_sets);
     for (size_t i = 0; i < num_sets; ++i) {
         cache.sets[i].slots.resize(blocks_per_set);
