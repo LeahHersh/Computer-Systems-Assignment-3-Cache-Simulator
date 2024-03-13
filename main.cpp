@@ -27,7 +27,11 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    // Initialize cache
     cache.sets.resize(num_sets);
+    for (size_t i = 0; i < num_sets; ++i) {
+        cache.sets[i].slots.resize(blocks_per_set);
+    }
 
     // Determine if cache is direct-mapped
     bool direct_mapped = true;
