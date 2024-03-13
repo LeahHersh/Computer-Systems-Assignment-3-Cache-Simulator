@@ -14,9 +14,9 @@ int main(int argc, char *argv[]) {
     int sim_time = 0;
 
     // Assign command-line arguments to variables
-    int num_sets = int(argv[0]);
-    int blocks_per_set = int(argv[1]);
-    int block_size = int(argv[2]);
+    int num_sets = atoi(argv[0]);
+    int blocks_per_set = atoi(argv[1]);
+    int block_size = atoi(argv[2]);
     bool write_allocate = argv[3]== "write-allocate" ? true : false;  // Okay?
     bool write_back = argv[4]== "write-back" ? true : false;
     std::string eviction_policy = argv[5];
