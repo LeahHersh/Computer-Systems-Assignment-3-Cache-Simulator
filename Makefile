@@ -1,5 +1,5 @@
 GCC = gcc
-CONSERVATIVE_FLAGS = -std=c99 -Wall -Wextra -pedantic
+CONSERVATIVE_FLAGS = -std=c99 -lm -Wall -Wextra -pedantic
 DEBUGGING_FLAGS = -g -O0
 CFLAGS = $(CONSERVATIVE_FLAGS) $(DEBUGGING_FLAGS)
 
