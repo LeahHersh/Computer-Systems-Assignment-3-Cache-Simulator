@@ -32,12 +32,12 @@ int main(int argc, char *argv[]) {
     cache.sets.resize(num_sets);
 
     // Determine if cache is direct-mapped
-    bool direct_mapped = false;
-    if (blocks_per_set == 1) {
+    bool direct_mapped = true;
+    /*if (blocks_per_set == 1) {
       direct_mapped = true;
-    }
+    } */
 
-    // Setting up variables for results:
+    // Setting up results variables:
     int total_loads = 0;
     int total_stores = 0;
     int load_hits = 0;
@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
           } else {
               // If the current slot is valid and has the same tag as the memory address
             if (curr_slot.valid && (curr_slot.tag == address_tag)) {
-              // The load is successful
+              // The store is successful
               store_hits++;
               // Otherwise, it's a miss
             } else {
@@ -95,6 +95,7 @@ int main(int argc, char *argv[]) {
           // Update access time regardless of if a load or store happened
           curr_slot.update_access_ts(sim_time);
         }
+
 
       sim_time++;
     }
