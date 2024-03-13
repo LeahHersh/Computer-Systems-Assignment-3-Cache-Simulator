@@ -1,3 +1,5 @@
+#ifndef CSIM_H
+#define CSIM_H
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -30,3 +32,4 @@ void write_allocate_miss();
 
 
 
+#endif
