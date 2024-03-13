@@ -6,6 +6,8 @@
 #include <math.h>
 #include <string>
 #include <sstream>
+#include <vector>
+
 
 int main(int argc, char *argv[]) {
     int sim_time = 0;
