@@ -90,9 +90,9 @@ int main(int argc, char *argv[]) {
         int num_tag_bits = 32 - num_offset_bits - num_index_bits;
 
         // Find the memory address's index
-        uint32_t address_index = (stoi(memory_address) >> num_offset_bits) & (1 << num_index_bits - 1);
+        uint32_t address_index = (stoi(memory_address) >> num_offset_bits) & ((1 << num_index_bits) - 1);
         // Find the memory address's tag
-        int32_t address_tag = (stoi(memory_address) >> num_offset_bits >> num_index_bits) & (1 << num_tag_bits - 1);
+        int32_t address_tag = (stoi(memory_address) >> num_offset_bits >> num_index_bits) & ((1 << num_tag_bits) - 1);
 
         // Find the slot being accessed
         Slot curr_slot = find_curr_slot(cache, address_index, address_tag);
