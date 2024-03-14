@@ -39,11 +39,15 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    // Determine if cache is direct-mapped
-    bool direct_mapped = true;
-    /*if (blocks_per_set == 1) {
-      direct_mapped = true;
-    } */
+    // Determine cache's mapping
+    std::string mapping;
+    if (blocks_per_set == 1) {
+      mapping = "direct_mapped";
+    } else if (num_sets == 1) {
+      mapping = "fully_associative";
+    } else {
+      mapping = "set-associative";
+    }
 
     // Setting up results variables:
     int total_loads = 0;
@@ -72,7 +76,7 @@ int main(int argc, char *argv[]) {
         std::string ignored;
         ss >> load_or_store >> memory_address >> ignored;
 
-        if (direct_mapped) {
+        if (mapping == "direct_mapped") {
           int num_offset_bits = log2(block_size);
           int num_index_bits = log2(num_sets);
           int num_tag_bits = 32 - num_offset_bits - num_index_bits;
@@ -115,7 +119,16 @@ int main(int argc, char *argv[]) {
       sim_time++;
     }
 
+    total_loads = load_hits + load_misses;
+    total_stores = store_hits + store_misses;
+
     std::cerr<< "Total loads: " << total_loads;
+    std::cerr<< "Total stores: " << total_stores;
+    std::cerr<< "Load hits: " << total_loads;
+    std::cerr<< "Load misses: " << total_stores;
+    std::cerr<< "Store hits: " << total_stores;
+    std::cerr<< "Store misses: " << total_loads;
+    std::cerr<< "Total cycles: " << total_stores;
 }
 
 #endif
