@@ -1,12 +1,11 @@
 CC = g++
-CONSERVATIVE_FLAGS = -Wall -Wextra -pedantic
+CONSERVATIVE_FLAGS = -std=c99 -Wall -Wextra -pedantic
 DEBUGGING_FLAGS = -g -O0
 CFLAGS = $(CONSERVATIVE_FLAGS) $(DEBUGGING_FLAGS)
 LIBS += -lm
 
-
 csim: main.o
-	$(CC) $(CFLAGS) -o csim.h csim.cpp $(LIBS)
+	$(CC) $(CFLAGS) -o csim $^ $(LIBS)
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) -c main.cpp
