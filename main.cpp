@@ -1,7 +1,6 @@
 #ifndef MAIN_CPP
 #define MAIN_CPP
 #include "csim.h"
-#include "csim.cpp"
 #include <stdio.h>
 #include <iostream>
 #include <math.h>
@@ -30,13 +29,13 @@ int main(int argc, char *argv[]) {
     }
 
     // Initialize cache
-    Cache cache;
-    cache.sets.resize(num_sets);
+    Cache* cache = new Cache();
+    (*cache).sets.resize(num_sets);
     for (int j = 0; j < num_sets; j++) {
-      cache.sets[j].slots.resize(blocks_per_set);
+      (*cache).sets[j].slots.resize(blocks_per_set);
 
       for(int i = 0; i < blocks_per_set; i++) {
-        cache.sets[j].slots[i] = {-1, false, 0, 0};
+        (*cache).sets[j].slots[i] = *(new Slot {-1, false, 0, 0});
       }
     }
 
@@ -71,26 +70,26 @@ int main(int argc, char *argv[]) {
         int32_t address_tag = (stoi(memory_address) >> num_offset_bits >> num_index_bits) & ((1 << num_tag_bits) - 1);
 
         // Find the slot being accessed
-        Slot curr_slot = find_curr_slot(cache, address_index, address_tag);
+        Slot* curr_slot = find_curr_slot(cache, address_index, address_tag);
 
         // If a read is being attempted
         if (load_or_store == "l") {  
           // If the current slot is valid and has the same tag as the memory address
-          if (curr_slot.valid && (curr_slot.tag == address_tag)) {
+          if ((*curr_slot).valid && ((*curr_slot).tag == address_tag)) {
             // The load is successful
             load_hits++;
 
             // Otherwise, it's a miss
           } else {
             load_misses++;
-            curr_slot.valid = true;
+            (*curr_slot).valid = true;
           }
-          curr_slot.update_load_ts(sim_time);
+          (*curr_slot).update_load_ts(sim_time);
 
         // If a store is being attempted
         } else {
             // If the current slot is valid and has the same tag as the memory address
-            if (curr_slot.valid && (curr_slot.tag == address_tag)) {
+            if ((*curr_slot).valid && ((*curr_slot).tag == address_tag)) {
               // The store is successful
               store_hits++;
               // Otherwise, it's a miss
@@ -100,7 +99,7 @@ int main(int argc, char *argv[]) {
           }
 
           // Update access time regardless of if a load or store happened
-          curr_slot.update_access_ts(sim_time);
+          (*curr_slot).update_access_ts(sim_time);
 
       sim_time++;
     }
