@@ -9,21 +9,22 @@
 #include <vector>
 
 
-Slot* find_curr_slot(Cache* cache, uint32_t index, int32_t tag) {
+int find_curr_slot(Cache* cache, uint32_t index, int32_t tag) {
   Set set = (*cache).sets[index];
 
-  int oldest_access = set.slots[0].access_ts;
-  Slot* oldest_use = &set.slots[0];
+/*   int oldest_access = set.slots[0].access_ts;
+  Slot* oldest_use = &set.slots[0]; */
 
   // Find slot with a matching tag or oldest access date
   for (int i = 0; i < set.slots.size(); i++) {
     Slot* curr = &(set.slots[i]);
 
     if ((*curr).tag == tag) {
-      return curr;
+      return i;
     }
+  } // TODO: remove?
 
-    // Keep track of which slot has the oldest access date
+/*     // Keep track of which slot has the oldest access date
     if ((*curr).access_ts < oldest_access) { 
       oldest_use = curr;
       oldest_access = (*curr).access_ts;
@@ -33,8 +34,8 @@ Slot* find_curr_slot(Cache* cache, uint32_t index, int32_t tag) {
   // Evict block used least recently
   (*oldest_use).tag = tag;
   (*oldest_use).valid = true;
-
-  return oldest_use;
+  //return oldest_use; */
+  return -1;
 }
 
 
@@ -59,9 +60,9 @@ int main(int argc, char *argv[]) {
 
     // Initialize cache
     Cache* cache = new Cache();
-    (*cache).sets.resize(num_sets);
+    cache->sets.resize(num_sets);
     for (int j = 0; j < num_sets; j++) {
-      (*cache).sets[j].slots.resize(blocks_per_set);
+      cache->sets[j].slots.resize(blocks_per_set);
 
       for(int i = 0; i < blocks_per_set; i++) {
         (*cache).sets[j].slots[i] = *(new Slot {-1, false, 0, 0});
@@ -99,26 +100,34 @@ int main(int argc, char *argv[]) {
         int32_t address_tag = (stoi(memory_address) >> num_offset_bits >> num_index_bits) & ((1 << num_tag_bits) - 1);
 
         // Find the slot being accessed
-        Slot* curr_slot = find_curr_slot(cache, address_index, address_tag);
+        Slot curr_slot;
+        int slot_index = find_curr_slot(cache, address_tag, address_index);
+        if (slot_index != -1) {
+          curr_slot = cache->sets[address_index].slots[slot_index];
+          curr_slot.tag = address_tag;
+          curr_slot.valid = true;
+        } else {
+
+        }
 
         // If a read is being attempted
         if (load_or_store == "l") {  
           // If the current slot is valid and has the same tag as the memory address
-          if ((*curr_slot).valid && ((*curr_slot).tag == address_tag)) {
+          if (curr_slot.valid && curr_slot.tag == address_tag) {
             // The load is successful
             load_hits++;
 
             // Otherwise, it's a miss
           } else {
             load_misses++;
-            (*curr_slot).valid = true;
+            curr_slot.valid = true;
           }
-          (*curr_slot).update_load_ts(sim_time);
+          curr_slot.update_load_ts(sim_time);
 
         // If a store is being attempted
         } else {
             // If the current slot is valid and has the same tag as the memory address
-            if ((*curr_slot).valid && ((*curr_slot).tag == address_tag)) {
+            if (curr_slot.valid && (curr_slot.tag == address_tag)) {
               // The store is successful
               store_hits++;
               // Otherwise, it's a miss
@@ -128,7 +137,7 @@ int main(int argc, char *argv[]) {
           }
 
           // Update access time regardless of if a load or store happened
-          (*curr_slot).update_access_ts(sim_time);
+          curr_slot.update_access_ts(sim_time);
 
       sim_time++;
     }
