@@ -76,6 +76,8 @@ int main(int argc, char *argv[]) {
         std::string ignored;
         ss >> load_or_store >> memory_address >> ignored;
 
+        mapping = "direct_mapped";
+
         if (mapping == "direct_mapped") {
           int num_offset_bits = log2(block_size);
           int num_index_bits = log2(num_sets);
@@ -126,13 +128,13 @@ int main(int argc, char *argv[]) {
     total_loads = load_hits + load_misses;
     total_stores = store_hits + store_misses;
 
-    std::cerr<< "Total loads: " << total_loads << "/n";
-    std::cerr<< "Total stores: " << total_stores << "/n";
-    std::cerr<< "Load hits: " << total_loads << "/n";
-    std::cerr<< "Load misses: " << total_stores << "/n";
-    std::cerr<< "Store hits: " << total_stores << "/n";
-    std::cerr<< "Store misses: " << total_loads << "/n";
-    std::cerr<< "Total cycles: " << total_stores << "/n";
+    std::cerr<< "Total loads: " << total_loads << "\n";
+    std::cerr<< "Total stores: " << total_stores << "\n";
+    std::cerr<< "Load hits: " << total_loads << "\n";
+    std::cerr<< "Load misses: " << total_stores << "\n";
+    std::cerr<< "Store hits: " << total_stores << "\n";
+    std::cerr<< "Store misses: " << total_loads << "\n";
+    std::cerr<< "Total cycles: " << total_stores << "\n";
 }
 
 #endif
