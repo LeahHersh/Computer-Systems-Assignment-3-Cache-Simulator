@@ -31,9 +31,13 @@ int main(int argc, char *argv[]) {
     // Initialize cache
     Cache cache;
     cache.sets.resize(num_sets);
-    for (int i = 0; i < num_sets; ++i) {
-        cache.sets[i].slots.resize(blocks_per_set);
+    for (int i = 0; i < num_sets; i++) {
+      cache.sets[i].slots.resize(blocks_per_set);
     }
+
+    std::cerr << cache.sets.size() << "\n";
+    Slot curr_slot = cache.sets[0].slots[0];
+    std::cerr << ":)\n";
 
     // Determine if cache is direct-mapped
     bool direct_mapped = true;
