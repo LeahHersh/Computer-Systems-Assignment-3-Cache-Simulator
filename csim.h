@@ -28,7 +28,6 @@ struct Cache {
 // Helper function called either if there's a read-miss or write-miss in write-allocate
 void write_allocate_miss();
 
-
 Slot find_curr_slot(Cache cache, uint32_t index, int32_t tag);
 
 #endif
