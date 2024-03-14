@@ -72,7 +72,8 @@ int main(int argc, char *argv[]) {
           // Find the memory address's tag
           uint32_t address_tag = (stoi(memory_address) >> num_offset_bits >> num_index_bits) & (1 << num_tag_bits - 1);
           
-          std::cerr << "hit 0";
+          std::cerr << address_index;
+          std::cerr << cache.sets.size();
           Slot curr_slot = cache.sets[address_index].slots[0];
           std::cerr << "hit 1";
           if (load_or_store == "l") {  
