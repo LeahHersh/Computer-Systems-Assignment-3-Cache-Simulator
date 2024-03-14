@@ -96,7 +96,9 @@ int main(int argc, char *argv[]) {
         int32_t address_tag = (stoi(memory_address) >> (num_offset_bits + num_index_bits)) & ((1 << num_tag_bits) - 1);
 
         int* LRU_chosen;
-
+        std::cerr << "current line's index: " << address_index << std::endl;
+        std::cerr << "current line's tag: " << address_tag << std::endl;
+        std::cerr << address_tag << std::endl;
         // Find the slot being accessed
         Slot* curr_slot;
         int slot_index = find_curr_slot(cache, address_tag, address_index, LRU_chosen);
@@ -107,7 +109,12 @@ int main(int argc, char *argv[]) {
           (*curr_slot).valid = true;
         } else {
           curr_slot = &(cache->sets[address_index].slots[*LRU_chosen]);
+          std::cerr << "Matching slot not found\n";
         }
+
+        std::cerr << "Chosen slot's index: " << slot_index << std::endl;
+        std::cerr << "Chosen slot's tag: " << (*curr_slot).tag << std::endl;
+        std::cerr << (*curr_slot).tag << std::endl;
 
         // If a read is being attempted
         if (load_or_store == "l") {  
