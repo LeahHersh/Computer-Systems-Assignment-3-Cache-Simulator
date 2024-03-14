@@ -31,6 +31,9 @@ Slot* find_curr_slot(Cache* cache, uint32_t index, int32_t tag) {
   }
 
   // Evict block used least recently
+  (*oldest_use).tag = tag;
+  (*oldest_use).valid = true;
+  
   return oldest_use;
 }
 
