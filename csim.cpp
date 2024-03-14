@@ -1,7 +1,6 @@
 #ifndef CSIM_CPP
 #define CSIM_CPP
 #include "csim.h"
-#endif
 
 Slot find_curr_slot(Cache cache, uint32_t index, int32_t tag) {
   Set set = cache.sets[index];
@@ -27,3 +26,5 @@ Slot find_curr_slot(Cache cache, uint32_t index, int32_t tag) {
   // Evict block used least recently
   return oldest_use;
 }
+
+#endif
