@@ -13,15 +13,15 @@ int main(int argc, char *argv[]) {
     int sim_time = 0;
 
     // Assign command-line arguments to variables
-    int num_sets = atoi(argv[0]);
-    std::cerr << argv[0] << "\n";
+    int num_sets = atoi(argv[1]);
+    std::cerr << argv[1] << "\n";
     std::cerr << num_sets << "\n";
     std::cerr << "!\n";
-    int blocks_per_set = atoi(argv[1]);
-    int block_size = atoi(argv[2]);
-    bool write_allocate = argv[3]== "write-allocate" ? true : false;  // Okay?
-    bool write_back = argv[4]== "write-back" ? true : false;
-    std::string eviction_policy = argv[5];
+    int blocks_per_set = atoi(argv[2]);
+    int block_size = atoi(argv[3]);
+    bool write_allocate = argv[4]== "write-allocate" ? true : false;  // Okay?
+    bool write_back = argv[5]== "write-back" ? true : false;
+    std::string eviction_policy = argv[6];
 
     // Check if parameters are invalid
     if(block_size < 4 || ceil(log2(block_size)) != floor(log2(block_size)) || ceil(log2(blocks_per_set)) != floor(log2(blocks_per_set)) ||
