@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
       cache.sets[j].slots.resize(blocks_per_set);
 
       for(int i = 0; i < blocks_per_set; i++) {
-        cache.sets[j].slots[i] = {};
+        cache.sets[j].slots[i] = {0, false, 0, 0};
       }
     }
 

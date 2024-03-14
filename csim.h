@@ -7,9 +7,9 @@
 
 struct Slot {
   uint32_t tag;
-  bool valid = false; 
-  uint32_t load_ts = 0;  // ts of last load
-  uint32_t access_ts = 0;  // ts of last store or load
+  bool valid; 
+  uint32_t load_ts;  // ts of last load
+  uint32_t access_ts;  // ts of last store or load
 
   void update_load_ts(int new_load_ts) { load_ts = new_load_ts; }
 
