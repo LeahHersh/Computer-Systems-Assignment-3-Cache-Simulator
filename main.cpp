@@ -1,7 +1,6 @@
 #ifndef MAIN_CPP
 #define MAIN_CPP
 #include "csim.h"
-#include "csim.cpp"
 #include <stdio.h>
 #include <iostream>
 #include <math.h>
