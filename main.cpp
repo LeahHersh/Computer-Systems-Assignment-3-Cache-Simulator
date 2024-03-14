@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
     } else if (num_sets == 1) {
       mapping = "fully_associative";
     } else {
-      mapping = "set-associative";
+      mapping = "set_associative";
     }
 
     // Setting up results variables:
@@ -87,7 +87,6 @@ int main(int argc, char *argv[]) {
           uint32_t address_tag = (stoi(memory_address) >> num_offset_bits >> num_index_bits) & (1 << num_tag_bits - 1);
 
           Slot curr_slot = cache.sets[address_index].slots[0];
-
           if (load_or_store == "l") {  
             // If the current slot is valid and has the same tag as the memory address
             if (curr_slot.valid && (curr_slot.tag == address_tag)) {
@@ -96,6 +95,7 @@ int main(int argc, char *argv[]) {
               // Otherwise, it's a miss
             } else {
               load_misses++;
+              curr_slot.valid = true;
             }
             curr_slot.update_load_ts(sim_time);
 
@@ -115,6 +115,10 @@ int main(int argc, char *argv[]) {
           curr_slot.update_access_ts(sim_time);
         }
 
+        else if (mapping == "set_associative") {
+
+        }
+
 
       sim_time++;
     }
@@ -122,13 +126,13 @@ int main(int argc, char *argv[]) {
     total_loads = load_hits + load_misses;
     total_stores = store_hits + store_misses;
 
-    std::cerr<< "Total loads: " << total_loads;
-    std::cerr<< "Total stores: " << total_stores;
-    std::cerr<< "Load hits: " << total_loads;
-    std::cerr<< "Load misses: " << total_stores;
-    std::cerr<< "Store hits: " << total_stores;
-    std::cerr<< "Store misses: " << total_loads;
-    std::cerr<< "Total cycles: " << total_stores;
+    std::cerr<< "Total loads: " << total_loads << "/n";
+    std::cerr<< "Total stores: " << total_stores << "/n";
+    std::cerr<< "Load hits: " << total_loads << "/n";
+    std::cerr<< "Load misses: " << total_stores << "/n";
+    std::cerr<< "Store hits: " << total_stores << "/n";
+    std::cerr<< "Store misses: " << total_loads << "/n";
+    std::cerr<< "Total cycles: " << total_stores << "/n";
 }
 
 #endif
