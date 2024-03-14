@@ -31,8 +31,12 @@ int main(int argc, char *argv[]) {
     // Initialize cache
     Cache cache;
     cache.sets.resize(num_sets);
-    for (int i = 0; i < num_sets; i++) {
-      cache.sets[i].slots.resize(blocks_per_set);
+    for (int j = 0; j < num_sets; j++) {
+      cache.sets[j].slots.resize(blocks_per_set);
+
+      for(int i = 0; i < blocks_per_set; i++) {
+        cache.sets[j].slots[i] = {};
+      }
     }
 
     std::cerr << cache.sets.size() << "\n";
