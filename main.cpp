@@ -38,10 +38,10 @@ int main(int argc, char *argv[]) {
         cache.sets[j].slots[i] = {0, false, 0, 0};
       }
     }
-
+    std::cerr << num_sets << "\n";
     std::cerr << cache.sets.size() << "\n";
     Slot curr_slot = cache.sets[0].slots[0];
-    std::cerr << ":)\n";
+    std::cerr << "Seg fault on line above- never reached\n";
 
     // Determine if cache is direct-mapped
     bool direct_mapped = true;
