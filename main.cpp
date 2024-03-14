@@ -98,36 +98,36 @@ int main(int argc, char *argv[]) {
         int* LRU_chosen;
 
         // Find the slot being accessed
-        Slot curr_slot;
+        Slot* curr_slot;
         int slot_index = find_curr_slot(cache, address_tag, address_index, LRU_chosen);
         // if the slot was in the cache
         if (slot_index != -1) {
-          curr_slot = cache->sets[address_index].slots[slot_index];
-          curr_slot.tag = address_tag;
-          curr_slot.valid = true;
+          curr_slot = &(cache->sets[address_index].slots[slot_index]);
+          (*curr_slot).tag = address_tag;
+          (*curr_slot).valid = true;
         } else {
-          curr_slot = cache->sets[address_index].slots[*LRU_chosen];
+          curr_slot = &(cache->sets[address_index].slots[*LRU_chosen]);
         }
 
         // If a read is being attempted
         if (load_or_store == "l") {  
           // If the current slot is valid and has the same tag as the memory address
-          if (curr_slot.valid && curr_slot.tag == address_tag) {
+          if ((*curr_slot).valid && (*curr_slot).tag == address_tag) {
             // The load is successful
             load_hits++;
 
             // Otherwise, it's a miss
           } else {
             load_misses++;
-            curr_slot.tag = address_tag;
-            curr_slot.valid = true;
+            (*curr_slot).tag = address_tag;
+            (*curr_slot).valid = true;
           }
-          curr_slot.update_load_ts(sim_time);
+          (*curr_slot).update_load_ts(sim_time);
 
         // If a store is being attempted
         } else {
             // If the current slot is valid and has the same tag as the memory address
-            if (curr_slot.valid && (curr_slot.tag == address_tag)) {
+            if ((*curr_slot).valid && ((*curr_slot).tag == address_tag)) {
               // The store is successful
               store_hits++;
               // Otherwise, it's a miss
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
           }
 
           // Update access time regardless of if a load or store happened
-          curr_slot.update_access_ts(sim_time);
+          (*curr_slot).update_access_ts(sim_time);
 
       sim_time++;
     }
