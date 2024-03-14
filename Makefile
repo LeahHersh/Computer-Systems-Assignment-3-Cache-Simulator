@@ -6,7 +6,7 @@ LIBS += -lm
 
 
 csim: main.o
-	$(CC) $(CFLAGS) -o csim.h csim.cpp $(LIBS)
+	$(CC) $(CFLAGS) -o csim $^ $(LIBS)
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) -c main.cpp
