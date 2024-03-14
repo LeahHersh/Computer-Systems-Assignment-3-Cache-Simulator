@@ -9,32 +9,28 @@
 #include <vector>
 
 
-int find_curr_slot(Cache* cache, uint32_t index, int32_t tag) {
+int find_curr_slot(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_index) {
   Set set = (*cache).sets[index];
 
-/*   int oldest_access = set.slots[0].access_ts;
-  Slot* oldest_use = &set.slots[0]; */
+  int oldest_access = set.slots[0].access_ts;
+  int oldest_use = 0; 
 
-  // Find slot with a matching tag or oldest access date
+  // Find slot with a matching tag or the oldest access date
   for (int i = 0; i < set.slots.size(); i++) {
     Slot* curr = &(set.slots[i]);
 
     if ((*curr).tag == tag) {
       return i;
     }
-  } // TODO: remove?
 
-/*     // Keep track of which slot has the oldest access date
+    // Keep track of which slot has the oldest access date
     if ((*curr).access_ts < oldest_access) { 
-      oldest_use = curr;
+      oldest_use = i;
       oldest_access = (*curr).access_ts;
     }
   }
 
-  // Evict block used least recently
-  (*oldest_use).tag = tag;
-  (*oldest_use).valid = true;
-  //return oldest_use; */
+  *LRU_slot_index = oldest_use;
   return -1;
 }
 
@@ -99,15 +95,18 @@ int main(int argc, char *argv[]) {
         // Find the memory address's tag
         int32_t address_tag = (stoi(memory_address) >> num_offset_bits >> num_index_bits) & ((1 << num_tag_bits) - 1);
 
+        int* LRU_chosen;
+
         // Find the slot being accessed
         Slot curr_slot;
-        int slot_index = find_curr_slot(cache, address_tag, address_index);
+        int slot_index = find_curr_slot(cache, address_tag, address_index, LRU_chosen);
+        // if the slot was in the cache
         if (slot_index != -1) {
           curr_slot = cache->sets[address_index].slots[slot_index];
           curr_slot.tag = address_tag;
           curr_slot.valid = true;
         } else {
-
+          curr_slot = cache->sets[address_index].slots[*LRU_chosen];
         }
 
         // If a read is being attempted
