@@ -62,6 +62,8 @@ int main(int argc, char *argv[]) {
 
     // For each line in the input trace file
     while (std::getline(std::cin, curr_trace_line)) {
+        std::cerr << "line: " << curr_trace_line << "\n";
+
         // Stringstream for current part of line
         std::istringstream ss(curr_trace_line);
 
@@ -83,7 +85,7 @@ int main(int argc, char *argv[]) {
           std::cerr << address_index << "\n";
           std::cerr << cache.sets.size() << "\n";
           Slot curr_slot = cache.sets[address_index].slots[0];
-          std::cerr << "hit 1";
+
           if (load_or_store == "l") {  
             // If the current slot is valid and has the same tag as the memory address
             if (curr_slot.valid && (curr_slot.tag == address_tag)) {
