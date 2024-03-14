@@ -28,8 +28,31 @@ struct Cache {
 // Helper function called either if there's a read-miss or write-miss in write-allocate
 void write_allocate_miss();
 
-Slot find_curr_slot(Cache cache, uint32_t index, int32_t tag);
 
+Slot find_curr_slot(Cache cache, uint32_t index, int32_t tag) {
+  Set set = cache.sets[index];
+
+  int oldest_access = set.slots[0].access_ts;
+  Slot oldest_use = set.slots[0];
+
+  // Find slot with a matching tag or oldest access date
+  for (int i = 0; i < set.slots.size(); i++) {
+    Slot curr = set.slots[i];
+
+    if (curr.tag == tag) {
+      return curr;
+    }
+
+    // Keep track of which slot has the oldest access date
+    if (curr.access_ts < oldest_access) { 
+      oldest_use = curr;
+      oldest_access = curr.access_ts;
+    }
+  }
+
+  // Evict block used least recently
+  return oldest_use;
+}
 
 
 #endif
