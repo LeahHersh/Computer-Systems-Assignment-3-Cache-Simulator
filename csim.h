@@ -6,10 +6,10 @@
 #include <vector>
 
 struct Slot {
-  uint32_t tag;
+  int32_t tag;
   bool valid; 
-  uint32_t load_ts;  // ts of last load
-  uint32_t access_ts;  // ts of last store or load
+  int load_ts;  // ts of last load
+  int access_ts;  // ts of last store or load
 
   void update_load_ts(int new_load_ts) { load_ts = new_load_ts; }
 

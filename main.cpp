@@ -35,18 +35,8 @@ int main(int argc, char *argv[]) {
       cache.sets[j].slots.resize(blocks_per_set);
 
       for(int i = 0; i < blocks_per_set; i++) {
-        cache.sets[j].slots[i] = {0, false, 0, 0};
+        cache.sets[j].slots[i] = {-1, false, 0, 0};
       }
-    }
-
-    // Determine cache's mapping
-    std::string mapping;
-    if (blocks_per_set == 1) {
-      mapping = "direct_mapped";
-    } else if (num_sets == 1) {
-      mapping = "fully_associative";
-    } else {
-      mapping = "set_associative";
     }
 
     // Setting up results variables:
@@ -58,52 +48,47 @@ int main(int argc, char *argv[]) {
     int store_misses = 0;
     int total_cycles = 0;
 
+    // Reading each line and adjusting results variables:
     std::string curr_trace_line;
-
-    if (std::cin.fail()) {
-        std::cerr << "Failed to read from input stream." << std::endl;
-    }
-
-    // For each line in the input trace file
     while (std::getline(std::cin, curr_trace_line)) {
-        std::cerr << "line: " << curr_trace_line << "\n";
 
-        // Stringstream for current part of line
+        // Parse the current input line
         std::istringstream ss(curr_trace_line);
-
         std::string load_or_store;
         std::string memory_address;
         std::string ignored;
         ss >> load_or_store >> memory_address >> ignored;
 
-        mapping = "direct_mapped";
+        // Calculate memory address's number of offset, index, and tag bits 
+        int num_offset_bits = log2(block_size);
+        int num_index_bits = log2(num_sets);
+        int num_tag_bits = 32 - num_offset_bits - num_index_bits;
 
-        if (mapping == "direct_mapped") {
-          int num_offset_bits = log2(block_size);
-          int num_index_bits = log2(num_sets);
-          int num_tag_bits = 32 - num_offset_bits - num_index_bits;
+        // Find the memory address's index
+        uint32_t address_index = (stoi(memory_address) >> num_offset_bits) & (1 << num_index_bits - 1);
+        // Find the memory address's tag
+        int32_t address_tag = (stoi(memory_address) >> num_offset_bits >> num_index_bits) & (1 << num_tag_bits - 1);
 
-          // Find the memory address's index
-          uint32_t address_index = (stoi(memory_address) >> num_offset_bits) & (1 << num_index_bits - 1);
-          // Find the memory address's tag
-          uint32_t address_tag = (stoi(memory_address) >> num_offset_bits >> num_index_bits) & (1 << num_tag_bits - 1);
+        // Find the slot being accessed
+        Slot curr_slot = find_curr_slot(cache, address_index, address_tag);
 
-          Slot curr_slot = cache.sets[address_index].slots[0];
-          if (load_or_store == "l") {  
-            // If the current slot is valid and has the same tag as the memory address
-            if (curr_slot.valid && (curr_slot.tag == address_tag)) {
-              // The load is successful
-              load_hits++;
-              // Otherwise, it's a miss
-            } else {
-              load_misses++;
-              curr_slot.valid = true;
-            }
-            curr_slot.update_load_ts(sim_time);
+        // If a read is being attempted
+        if (load_or_store == "l") {  
+          // If the current slot is valid and has the same tag as the memory address
+          if (curr_slot.valid && (curr_slot.tag == address_tag)) {
+            // The load is successful
+            load_hits++;
 
-          // If a store is being attempted
+            // Otherwise, it's a miss
           } else {
-              // If the current slot is valid and has the same tag as the memory address
+            load_misses++;
+            curr_slot.valid = true;
+          }
+          curr_slot.update_load_ts(sim_time);
+
+        // If a store is being attempted
+        } else {
+            // If the current slot is valid and has the same tag as the memory address
             if (curr_slot.valid && (curr_slot.tag == address_tag)) {
               // The store is successful
               store_hits++;
@@ -115,12 +100,6 @@ int main(int argc, char *argv[]) {
 
           // Update access time regardless of if a load or store happened
           curr_slot.update_access_ts(sim_time);
-        }
-
-        else if (mapping == "set_associative") {
-
-        }
-
 
       sim_time++;
     }
@@ -130,11 +109,37 @@ int main(int argc, char *argv[]) {
 
     std::cerr<< "Total loads: " << total_loads << "\n";
     std::cerr<< "Total stores: " << total_stores << "\n";
-    std::cerr<< "Load hits: " << total_loads << "\n";
-    std::cerr<< "Load misses: " << total_stores << "\n";
-    std::cerr<< "Store hits: " << total_stores << "\n";
-    std::cerr<< "Store misses: " << total_loads << "\n";
-    std::cerr<< "Total cycles: " << total_stores << "\n";
+    std::cerr<< "Load hits: " << load_hits << "\n";
+    std::cerr<< "Load misses: " << load_misses << "\n";
+    std::cerr<< "Store hits: " << store_hits << "\n";
+    std::cerr<< "Store misses: " << store_misses << "\n";
+    std::cerr<< "Total cycles: " << total_cycles << "\n";
+}
+
+
+Slot find_curr_slot(Cache cache, uint32_t index, int32_t tag) {
+  Set set = cache.sets[index];
+
+  int oldest_access = set.slots[0].access_ts;
+  Slot oldest_use = set.slots[0];
+
+  // Find slot with a matching tag or oldest access date
+  for (int i = 0; i < set.slots.size(); i++) {
+    Slot curr = set.slots[i];
+
+    if (curr.tag == tag) {
+      return curr;
+    }
+
+    // Keep track of which slot has the oldest access date
+    if (curr.access_ts < oldest_access) { 
+      oldest_use = curr;
+      oldest_access = curr.access_ts;
+    }
+  }
+
+  // Evict block used least recently
+  return oldest_use;
 }
 
 #endif
