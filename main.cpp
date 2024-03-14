@@ -14,9 +14,6 @@ int main(int argc, char *argv[]) {
 
     // Assign command-line arguments to variables
     int num_sets = atoi(argv[1]);
-    std::cerr << argv[1] << "\n";
-    std::cerr << num_sets << "\n";
-    std::cerr << "!\n";
     int blocks_per_set = atoi(argv[2]);
     int block_size = atoi(argv[3]);
     bool write_allocate = argv[4]== "write-allocate" ? true : false;  // Okay?
@@ -41,10 +38,6 @@ int main(int argc, char *argv[]) {
         cache.sets[j].slots[i] = {0, false, 0, 0};
       }
     }
-    std::cerr << num_sets << "\n";
-    std::cerr << cache.sets.size() << "\n";
-    Slot curr_slot = cache.sets[0].slots[0];
-    std::cerr << "Seg fault on line above- never reached\n";
 
     // Determine if cache is direct-mapped
     bool direct_mapped = true;
@@ -62,6 +55,10 @@ int main(int argc, char *argv[]) {
     int total_cycles = 0;
 
     std::string curr_trace_line;
+
+    if (std::cin.fail()) {
+        std::cerr << "Failed to read from input stream." << std::endl;
+    }
 
     // For each line in the input trace file
     while (std::getline(std::cin, curr_trace_line)) {
