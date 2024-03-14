@@ -14,6 +14,8 @@ int main(int argc, char *argv[]) {
 
     // Assign command-line arguments to variables
     int num_sets = atoi(argv[0]);
+    std::cerr << argv[0] << "\n";
+    std::cerr << num_sets << "\n";
     int blocks_per_set = atoi(argv[1]);
     int block_size = atoi(argv[2]);
     bool write_allocate = argv[3]== "write-allocate" ? true : false;  // Okay?
