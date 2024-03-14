@@ -116,6 +116,8 @@ int main(int argc, char *argv[]) {
 
       sim_time++;
     }
+
+    std::cerr<< "Total loads: " << total_loads;
 }
 
 #endif
