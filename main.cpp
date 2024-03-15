@@ -168,9 +168,9 @@ int main(int, char *argv[]) {
                 total_cycles += (25 * block_size);
               }
 
-              // Add cycle for a write to cache
-              total_cycles++;
             }
+            // Add cycle for a write to the cache regardless of if a hit or miss happened
+            total_cycles++;
           }
 
       // Update slot access time and simulation time regardless of if a load or store happened
