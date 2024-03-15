@@ -126,7 +126,6 @@ int main(int, char *argv[]) {
           if (block_in_cache) {
             // The load is successful
             load_hits++;
-            total_cycles += 1;
 
             // Otherwise, it's a miss
           } else {
@@ -134,6 +133,8 @@ int main(int, char *argv[]) {
             total_cycles += (25 * block_size);
           }
           
+          // Update last load time and add a cycle for the read regardless of if there was a hit or a miss
+          total_cycles += 1;
           (*curr_slot).update_load_ts(sim_time);
 
         // If a write is being attempted
