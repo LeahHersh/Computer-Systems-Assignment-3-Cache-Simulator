@@ -121,13 +121,14 @@ int main(int, char *argv[]) {
         (*curr_slot).tag = address_tag;
         (*curr_slot).valid = true;
 
+        /* Start of load/store */
+
         // If a read is being attempted
         if (load_or_store == "l") {  
           // If the current slot is valid and had the same tag as the memory address's tag
           if (block_in_cache) {
             // The load is successful
             load_hits++;
-            total_cycles += 1;
 
             // Otherwise, it's a miss
           } else {
@@ -135,7 +136,9 @@ int main(int, char *argv[]) {
             total_cycles += (25 * block_size);
           }
           
+          // Regardless of if there was a hit or miss, update the slot's access time and "update the block"
           (*curr_slot).update_load_ts(sim_time);
+          total_cycles += 1;
 
         // If a write is being attempted
         } else {
