@@ -10,10 +10,13 @@
 
 
 int find_curr_slot(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_index) {
+  std::cerr << "hit 0\n";
+  std::cerr << index << std::endl;
   Set set = (*cache).sets[index];
+  std::cerr << "hit 1\n";
 
   int oldest_access = set.slots[0].access_ts;
-  int oldest_use = 0; 
+  int oldest_use_index = 0; 
 
   // Find slot with a matching tag or the oldest access date
   for (int i = 0; i < set.slots.size(); i++) {
@@ -25,12 +28,12 @@ int find_curr_slot(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_inde
 
     // Keep track of which slot has the oldest access date
     if ((*curr).access_ts < oldest_access) { 
-      oldest_use = i;
+      oldest_use_index = i;
       oldest_access = (*curr).access_ts;
     }
   }
 
-  *LRU_slot_index = oldest_use;
+  *LRU_slot_index = oldest_use_index;
   return -1;
 }
 
