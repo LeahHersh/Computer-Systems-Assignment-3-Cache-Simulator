@@ -10,10 +10,7 @@
 
 
 int find_curr_slot(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_index) {
-  std::cerr << "hit 0\n";
-  std::cerr << index << std::endl;
   Set set = (*cache).sets[index];
-  std::cerr << "hit 1\n";
 
   int oldest_access = set.slots[0].access_ts;
   int oldest_use_index = 0; 
@@ -104,7 +101,7 @@ int main(int argc, char *argv[]) {
         std::cerr << address_tag << std::endl;
         // Find the slot being accessed
         Slot* curr_slot;
-        int slot_index = find_curr_slot(cache, address_tag, address_index, LRU_chosen);
+        int slot_index = find_curr_slot(cache, address_index, address_tag, LRU_chosen);
         // if the slot was in the cache
         if (slot_index != -1) {
           curr_slot = &(cache->sets[address_index].slots[slot_index]);
