@@ -99,11 +99,11 @@ int main(int, char *argv[]) {
         int32_t address_tag = (stoul(memory_address, nullptr, 0) >> (num_offset_bits + num_index_bits)) & ((1 << num_tag_bits) - 1);
 
         // Make an int pointer that will be updated to the least-recently-accessed slot's index
-        int* LRU_chosen_index;
+         int LRU_chosen_index;
 
         // Find the slot being accessed
         Slot* curr_slot;
-        int slot_index = find_curr_slot(cache, address_index, address_tag, LRU_chosen_index);
+        int slot_index = find_curr_slot(cache, address_index, address_tag, &LRU_chosen_index);
         bool block_in_cache = false;
 
         // if the block was in the cache, load/write to curr_slot and set block_in_cache to true
@@ -113,7 +113,7 @@ int main(int, char *argv[]) {
 
         // Otherwise, evict the slot favored by LRU
         } else {
-          curr_slot = &(cache->sets[address_index].slots[*LRU_chosen_index]);
+          curr_slot = &(cache->sets[address_index].slots[LRU_chosen_index]);
         }
 
         // Update the slot's tag and its validity status
