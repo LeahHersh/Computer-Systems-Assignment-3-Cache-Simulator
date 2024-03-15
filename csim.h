@@ -26,8 +26,5 @@ struct Cache {
   std::vector<Set> sets;
 };
 
-// Helper function called either if there's a read-miss or write-miss in write-allocate
-void write_allocate_miss();
-
 
 #endif

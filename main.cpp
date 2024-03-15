@@ -38,20 +38,20 @@ int find_curr_slot(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_inde
 }
 
 
-int main(int argc, char *argv[]) {
+int main(char *argv[]) {
     int sim_time = 0;
 
     // Assign command-line arguments to variables
     int num_sets = atoi(argv[1]);
     int blocks_per_set = atoi(argv[2]);
     int block_size = atoi(argv[3]);
-    bool write_allocate = argv[4]== "write-allocate" ? true : false;  // Okay?
-    bool write_back = argv[5]== "write-back" ? true : false;
-    std::string eviction_policy = argv[6];
+    bool write_allocate = std::string(argv[4]) == "write-allocate" ? true : false;
+    bool write_back = std::string(argv[5]) == "write-back" ? true : false;
+    std::string eviction_policy = std::string(argv[6]);
 
     // Check if parameters are invalid
-    if(block_size < 4 || ceil(log2(block_size)) != floor(log2(block_size)) || ceil(log2(blocks_per_set)) != floor(log2(blocks_per_set)) ||
-      ceil(log2(num_sets)) != floor(log2(num_sets)) || (write_back && !write_allocate)) {
+    if(block_size < 4 || (block_size & (block_size - 1)) == 0 || (blocks_per_set & (blocks_per_set - 1)) == 0 ||
+      (num_sets & (num_sets - 1)) == 0 || (write_back && !write_allocate)) {
 
         std::cerr << "Invalid configuration" << std::endl;
         return 1;
@@ -61,11 +61,7 @@ int main(int argc, char *argv[]) {
     Cache* cache = new Cache();
     cache->sets.resize(num_sets);
     for (int j = 0; j < num_sets; j++) {
-      cache->sets[j].slots.resize(blocks_per_set);
-
-      for(int i = 0; i < blocks_per_set; i++) {
-        (*cache).sets[j].slots[i] = *(new Slot {-1, false, 0, 0});
-      }
+      cache->sets[j].slots.resize(blocks_per_set, {-1, false, false, 0, 0});
     }
 
     // Setting up results variables:
@@ -106,22 +102,23 @@ int main(int argc, char *argv[]) {
         int slot_index = find_curr_slot(cache, address_index, address_tag, LRU_chosen_index);
         bool block_in_cache = false;
 
-        // if the block was in the cache, set block_in_cache to true
+        // if the block was in the cache, load/write to curr_slot and set block_in_cache to true
         if (slot_index != -1) {
           curr_slot = &(cache->sets[address_index].slots[slot_index]);
           block_in_cache = true;
 
+        // Otherwise, evict the slot favored by LRU
         } else {
           curr_slot = &(cache->sets[address_index].slots[*LRU_chosen_index]);
         }
 
-        // Update the cache's tag and validity status
+        // Update the slot's tag and its validity status
         (*curr_slot).tag = address_tag;
         (*curr_slot).valid = true;
 
         // If a read is being attempted
         if (load_or_store == "l") {  
-          // If the current slot is valid and has the same tag as the memory address
+          // If the current slot is valid and had the same tag as the memory address's tag
           if (block_in_cache) {
             // The load is successful
             load_hits++;
