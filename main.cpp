@@ -136,7 +136,7 @@ int main(int, char *argv[]) {
           
           (*curr_slot).update_load_ts(sim_time);
 
-        // If a store is being attempted
+        // If a write is being attempted
         } else {
             // If the current slot is valid and has the same tag as the memory address
             if (block_in_cache) {
