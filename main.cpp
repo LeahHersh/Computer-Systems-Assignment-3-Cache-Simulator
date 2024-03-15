@@ -50,7 +50,7 @@ int main(int, char *argv[]) {
     std::string eviction_policy = std::string(argv[6]);
 
     // Check if parameters are invalid
-    if(block_size < 4 || (block_size & (block_size - 1)) == 0 || (blocks_per_set & (blocks_per_set - 1)) == 0 ||
+    if(block_size < 4 || (block_size & (block_size - 1)) == 0 || 
       (num_sets & (num_sets - 1)) == 0 || (write_back && !write_allocate)) {
 
         std::cerr << "Invalid configuration" << std::endl;
