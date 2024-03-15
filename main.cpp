@@ -182,13 +182,13 @@ int main(int, char *argv[]) {
     total_stores = store_hits + store_misses;
 
     // Print all results values
-    std::cerr << "Total loads: " << total_loads << "\n";
-    std::cerr << "Total stores: " << total_stores << "\n";
-    std::cerr << "Load hits: " << load_hits << "\n";
-    std::cerr << "Load misses: " << load_misses << "\n";
-    std::cerr << "Store hits: " << store_hits << "\n";
-    std::cerr << "Store misses: " << store_misses << "\n";
-    std::cerr << "Total cycles: " << total_cycles << "\n";
+    std::cout << "Total loads: " << total_loads << "\n";
+    std::cout << "Total stores: " << total_stores << "\n";
+    std::cout << "Load hits: " << load_hits << "\n";
+    std::cout << "Load misses: " << load_misses << "\n";
+    std::cout << "Store hits: " << store_hits << "\n";
+    std::cout << "Store misses: " << store_misses << "\n";
+    std::cout << "Total cycles: " << total_cycles << "\n";
 }
 
 
