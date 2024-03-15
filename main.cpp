@@ -150,24 +150,23 @@ int main(int, char *argv[]) {
             } else {
               store_misses++;
 
+
               // Because an eviction may have taken place, a write-back to memory might be necessary
               if (write_back && (*curr_slot).dirty) {
                 (*curr_slot).dirty = false;
-                total_cycles += (25 * block_size);
+                total_cycles += (25 * blocks_per_set);
               }
 
-              // If the cache is write-allocate, it retrieves the new block from main memory before the store
+              // If the cache is write-allocate, it retrieves the new block from main memory, then performs the write
               if (write_allocate) {
-                total_cycles += (25 * block_size);
+                total_cycles += (25 * blocks_per_set) + 1;
               } 
               
               // If the cache is write-through, it writes to main memory as well as the cache
               if (!write_back) {
-                total_cycles += (25 * block_size);
+                total_cycles += (25 * blocks_per_set);
               }
 
-              // Add cycle for a write to cache
-              total_cycles++;
             }
           }
 
