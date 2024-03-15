@@ -14,23 +14,26 @@ int find_curr_slot(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_inde
 
   int oldest_access = set.slots[0].access_ts;
   int oldest_use_index = 0; 
+  int num_slots = set.slots.size();
 
   // Find slot with a matching tag or the oldest access date
-  for (int i = 0; i < set.slots.size(); i++) {
+  for (int i = 0; i < num_slots; i++) {
     Slot* curr = &(set.slots[i]);
 
     if ((*curr).tag == tag) {
       return i;
     }
 
-    // Keep track of which slot has the oldest access date
+    // Update which slot has the oldest access date if curr is "older"
     if ((*curr).access_ts < oldest_access) { 
       oldest_use_index = i;
       oldest_access = (*curr).access_ts;
     }
   }
 
+  // Set the LRU-chosen slot up to be evicted.
   *LRU_slot_index = oldest_use_index;
+
   return -1;
 }
 
@@ -50,7 +53,7 @@ int main(int argc, char *argv[]) {
     if(block_size < 4 || ceil(log2(block_size)) != floor(log2(block_size)) || ceil(log2(blocks_per_set)) != floor(log2(blocks_per_set)) ||
       ceil(log2(num_sets)) != floor(log2(num_sets)) || (write_back && !write_allocate)) {
 
-        std::cerr << "Invalid configuration\n";
+        std::cerr << "Invalid configuration" << std::endl;
         return 1;
     }
 
@@ -129,22 +132,46 @@ int main(int argc, char *argv[]) {
           if (block_in_cache) {
             // The load is successful
             load_hits++;
+            total_cycles += 1;
 
             // Otherwise, it's a miss
           } else {
             load_misses++;
+            total_cycles += (100 * block_size);
           }
+          
           (*curr_slot).update_load_ts(sim_time);
 
         // If a store is being attempted
         } else {
             // If the current slot is valid and has the same tag as the memory address
             if (block_in_cache) {
-              // The store is successful
+              // The store is successful, and the bit becomes dirty if it wasn't already (in write-backs)
               store_hits++;
-              // Otherwise, it's a miss
+              if (write_back) { (*curr_slot).dirty = true; }
+
+              // Otherwise, it's a miss 
             } else {
               store_misses++;
+
+              // Because an eviction took place, a write-back to memory may be needed
+              if (write_back && (*curr_slot).dirty) {
+                (*curr_slot).dirty = false;
+                total_cycles += (100 * block_size);
+              }
+
+              // If the cache is write-allocate, it retrieves the new block from main memory before the store
+              if (write_allocate) {
+                total_cycles += (100 * block_size);
+              } 
+              
+              // If the cache is write-through, it writes to main memory as well as the cache
+              if (!write_back) {
+                total_cycles += (100 * block_size);
+              }
+
+              // Write to cache
+              total_cycles++;
             }
           }
 

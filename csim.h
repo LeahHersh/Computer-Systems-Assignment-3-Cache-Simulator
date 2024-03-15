@@ -8,6 +8,7 @@
 struct Slot {
   int32_t tag;
   bool valid; 
+  bool dirty;
   int load_ts;  // ts of last load
   int access_ts;  // ts of last store or load
 
