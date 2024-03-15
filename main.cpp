@@ -133,8 +133,6 @@ int main(int argc, char *argv[]) {
             // Otherwise, it's a miss
           } else {
             load_misses++;
-            (*curr_slot).tag = address_tag;
-            (*curr_slot).valid = true;
           }
           (*curr_slot).update_load_ts(sim_time);
 
