@@ -98,9 +98,8 @@ int main(int, char *argv[]) {
         // Find the memory address's tag
         int32_t address_tag = (stoul(memory_address, nullptr, 0) >> (num_offset_bits + num_index_bits)) & ((1 << num_tag_bits) - 1);
 
-        // Make an int pointer that will be updated to the least-recently-accessed slot's index
         // int that will be updated to the least-recently-accessed slot's index if no match is found
-         int LRU_chosen_index;
+        int LRU_chosen_index = 0;
 
         // Find the slot being accessed
         Slot* curr_slot;
