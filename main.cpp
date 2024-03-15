@@ -12,6 +12,7 @@
 int find_curr_slot(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_index) {
   Set set = (*cache).sets[index];
 
+  // Set up variables for keeping track of which slot has been accessed least recently
   int oldest_access = set.slots[0].access_ts;
   int oldest_use_index = 0; 
   int num_slots = set.slots.size();
@@ -32,10 +33,10 @@ int find_curr_slot(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_inde
     }
   }
 
-  // Set the LRU-chosen slot up to be evicted
+  // Assign the LRU-chosen slot, so that it can be written to or evicted
   *LRU_slot_index = oldest_use_index;
 
-  // Indicate that no slots with a matching tag were found in the set 
+  // Indicate that no slots with a matching tag were found in the set
   return -1;
 }
 
