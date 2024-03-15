@@ -126,10 +126,10 @@ int main(int, char *argv[]) {
           if (block_in_cache) {
             // The load is successful
             load_hits++;
+            total_cycles += 1;
 
             // Otherwise, it's a miss
           } else {
-            load_misses++;
             total_cycles += (25 * block_size);
           }
           
@@ -139,9 +139,8 @@ int main(int, char *argv[]) {
 
         // If a write is being attempted
         } else {
-            // If the current slot is valid and has the same tag as the memory address, and every store isn't 
-            // written straight to main memory
-            if (block_in_cache && !(!write_allocate && !write_back)) {
+            // If the current slot is valid and has the same tag as the memory address
+            if (block_in_cache) {
               // The store is successful, and the bit becomes dirty if it wasn't already (in write-backs)
               store_hits++;
               if (write_back) { (*curr_slot).dirty = true; }
@@ -150,23 +149,24 @@ int main(int, char *argv[]) {
             } else {
               store_misses++;
 
-
               // Because an eviction may have taken place, a write-back to memory might be necessary
               if (write_back && (*curr_slot).dirty) {
                 (*curr_slot).dirty = false;
-                total_cycles += (25 * blocks_per_set);
+                total_cycles += (25 * block_size);
               }
 
-              // If the cache is write-allocate, it retrieves the new block from main memory, then performs the write
+              // If the cache is write-allocate, it retrieves the new block from main memory before the store
               if (write_allocate) {
-                total_cycles += (25 * blocks_per_set) + 1;
+                total_cycles += (25 * block_size);
               } 
               
               // If the cache is write-through, it writes to main memory as well as the cache
               if (!write_back) {
-                total_cycles += (25 * blocks_per_set);
+                total_cycles += (25 * block_size);
               }
 
+              // Add cycle for a write to cache
+              total_cycles++;
             }
           }
 
@@ -188,6 +188,5 @@ int main(int, char *argv[]) {
     std::cerr << "Store misses: " << store_misses << "\n";
     std::cerr << "Total cycles: " << total_cycles << "\n";
 }
-
 
 #endif
