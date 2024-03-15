@@ -102,18 +102,22 @@ int main(int argc, char *argv[]) {
 
         // Find the slot being accessed
         Slot* curr_slot;
-        bool block_in_cache = false;
         int slot_index = find_curr_slot(cache, address_index, address_tag, LRU_chosen_index);
-        // if the slot was in the cache
+        bool block_in_cache = false;
+
+        // if the block was in the cache, set block_in_cache to true
         if (slot_index != -1) {
           curr_slot = &(cache->sets[address_index].slots[slot_index]);
-          (*curr_slot).tag = address_tag;
-          (*curr_slot).valid = true;
           block_in_cache = true;
+
         } else {
           curr_slot = &(cache->sets[address_index].slots[*LRU_chosen_index]);
           std::cerr << "Matching slot not found\n";
         }
+
+        // Update the cache's tag and validity status
+        (*curr_slot).tag = address_tag;
+        (*curr_slot).valid = true;
 
         std::cerr << "Chosen slot's index: " << slot_index << std::endl;
         std::cerr << "Chosen slot's tag: " << (*curr_slot).tag << std::endl;
@@ -137,7 +141,7 @@ int main(int argc, char *argv[]) {
         // If a store is being attempted
         } else {
             // If the current slot is valid and has the same tag as the memory address
-            if ((*curr_slot).valid && ((*curr_slot).tag == address_tag)) {
+            if (block_in_cache) {
               // The store is successful
               store_hits++;
               // Otherwise, it's a miss
