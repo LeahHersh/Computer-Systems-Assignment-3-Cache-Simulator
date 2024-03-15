@@ -95,7 +95,7 @@ int main(int, char *argv[]) {
         int32_t address_tag = (stoul(memory_address, nullptr, 0) >> (num_offset_bits + num_index_bits)) & ((1 << num_tag_bits) - 1);
 
         // Make an int pointer that will be updated to the least-recently-accessed slot's index
-        int* LRU_chosen_index = 0;
+        int* LRU_chosen_index;
 
         // Find the slot being accessed
         Slot* curr_slot;
