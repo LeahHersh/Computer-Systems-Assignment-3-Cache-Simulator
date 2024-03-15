@@ -20,6 +20,7 @@ int find_curr_slot(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_inde
   for (int i = 0; i < num_slots; i++) {
     Slot* curr = &(set.slots[i]);
 
+    // If a slot with a matching tag was found, return that tag
     if ((*curr).tag == tag) {
       return i;
     }
@@ -31,9 +32,10 @@ int find_curr_slot(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_inde
     }
   }
 
-  // Set the LRU-chosen slot up to be evicted.
+  // Set the LRU-chosen slot up to be evicted
   *LRU_slot_index = oldest_use_index;
 
+  // Indicate that no slots with a matching tag were found in the set 
   return -1;
 }
 
@@ -49,7 +51,7 @@ int main(int, char *argv[]) {
     bool write_back = std::string(argv[5]) == "write-back" ? true : false;
     std::string eviction_policy = std::string(argv[6]);
 
-    // Check if parameters are invalid
+    // Check if the input parameters are invalid
     if(block_size < 4 || !((block_size & (block_size - 1)) == 0) || 
       !((num_sets & (num_sets - 1)) == 0) || (write_back && !write_allocate)) {
 
@@ -57,14 +59,15 @@ int main(int, char *argv[]) {
         return 1;
     }
 
-    // Initialize cache
+    // Initialize the cache:
     Cache* cache = new Cache();
     cache->sets.resize(num_sets);
     for (int j = 0; j < num_sets; j++) {
+      // Each slot is initialized with an invalid tag, to clean/invalid, and as unaccessed/never loaded
       cache->sets[j].slots.resize(blocks_per_set, {-1, false, false, 0, 0});
     }
 
-    // Setting up results variables:
+    // Set up results variables:
     int total_loads = 0;
     int total_stores = 0;
     int load_hits = 0;
@@ -73,7 +76,7 @@ int main(int, char *argv[]) {
     int store_misses = 0;
     int total_cycles = 0;
 
-    // Reading each line and adjusting results variables:
+    // Read and act on each line of the trace file:
     std::string curr_trace_line;
     while (std::getline(std::cin, curr_trace_line)) {
 
@@ -127,7 +130,7 @@ int main(int, char *argv[]) {
             // Otherwise, it's a miss
           } else {
             load_misses++;
-            total_cycles += (100 * block_size);
+            total_cycles += (25 * block_size);
           }
           
           (*curr_slot).update_load_ts(sim_time);
@@ -144,20 +147,20 @@ int main(int, char *argv[]) {
             } else {
               store_misses++;
 
-              // Because an eviction took place, a write-back to memory may be needed
+              // Because an eviction may have taken place, a write-back to memory might be necessary
               if (write_back && (*curr_slot).dirty) {
                 (*curr_slot).dirty = false;
-                total_cycles += (100 * block_size);
+                total_cycles += (25 * block_size);
               }
 
               // If the cache is write-allocate, it retrieves the new block from main memory before the store
               if (write_allocate) {
-                total_cycles += (100 * block_size);
+                total_cycles += (25 * block_size);
               } 
               
               // If the cache is write-through, it writes to main memory as well as the cache
               if (!write_back) {
-                total_cycles += (100 * block_size);
+                total_cycles += (25 * block_size);
               }
 
               // Add cycle for a write to cache
@@ -170,16 +173,18 @@ int main(int, char *argv[]) {
       sim_time++;
     }
 
+    // Calculate total loads and stores
     total_loads = load_hits + load_misses;
     total_stores = store_hits + store_misses;
 
-    std::cerr<< "Total loads: " << total_loads << "\n";
-    std::cerr<< "Total stores: " << total_stores << "\n";
-    std::cerr<< "Load hits: " << load_hits << "\n";
-    std::cerr<< "Load misses: " << load_misses << "\n";
-    std::cerr<< "Store hits: " << store_hits << "\n";
-    std::cerr<< "Store misses: " << store_misses << "\n";
-    std::cerr<< "Total cycles: " << total_cycles << "\n";
+    // Print all results values
+    std::cerr << "Total loads: " << total_loads << "\n";
+    std::cerr << "Total stores: " << total_stores << "\n";
+    std::cerr << "Load hits: " << load_hits << "\n";
+    std::cerr << "Load misses: " << load_misses << "\n";
+    std::cerr << "Store hits: " << store_hits << "\n";
+    std::cerr << "Store misses: " << store_misses << "\n";
+    std::cerr << "Total cycles: " << total_cycles << "\n";
 }
 
 
