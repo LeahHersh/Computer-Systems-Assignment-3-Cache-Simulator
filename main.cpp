@@ -38,7 +38,7 @@ int find_curr_slot(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_inde
 }
 
 
-int main(char *argv[]) {
+int main(int, char *argv[]) {
     int sim_time = 0;
 
     // Assign command-line arguments to variables
@@ -95,7 +95,7 @@ int main(char *argv[]) {
         int32_t address_tag = (stoul(memory_address, nullptr, 0) >> (num_offset_bits + num_index_bits)) & ((1 << num_tag_bits) - 1);
 
         // Make an int pointer that will be updated to the least-recently-accessed slot's index
-        int* LRU_chosen_index;
+        int* LRU_chosen_index = 0;
 
         // Find the slot being accessed
         Slot* curr_slot;
