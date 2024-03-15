@@ -100,8 +100,6 @@ int main(int argc, char *argv[]) {
 
         // Make an int pointer that will be updated to the least-recently-accessed slot's index
         int* LRU_chosen_index;
-        std::cerr << "current line's index: " << address_index << std::endl;
-        std::cerr << "current line's tag: " << address_tag << std::endl;
 
         // Find the slot being accessed
         Slot* curr_slot;
@@ -115,16 +113,11 @@ int main(int argc, char *argv[]) {
 
         } else {
           curr_slot = &(cache->sets[address_index].slots[*LRU_chosen_index]);
-          std::cerr << "Matching slot not found\n";
         }
 
         // Update the cache's tag and validity status
         (*curr_slot).tag = address_tag;
         (*curr_slot).valid = true;
-
-        std::cerr << "Chosen slot's index: " << slot_index << std::endl;
-        std::cerr << "Chosen slot's tag: " << (*curr_slot).tag << std::endl;
-        std::cerr << (*curr_slot).tag << std::endl;
 
         // If a read is being attempted
         if (load_or_store == "l") {  
