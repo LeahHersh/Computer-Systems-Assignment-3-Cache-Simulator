@@ -98,6 +98,7 @@ int main(int, char *argv[]) {
         // Find the memory address's tag
         int32_t address_tag = (stoul(memory_address, nullptr, 0) >> (num_offset_bits + num_index_bits)) & ((1 << num_tag_bits) - 1);
 
+        // Make an int pointer that will be updated to the least-recently-accessed slot's index
         // int that will be updated to the least-recently-accessed slot's index if no match is found
          int LRU_chosen_index;
 
@@ -130,11 +131,10 @@ int main(int, char *argv[]) {
 
             // Otherwise, it's a miss
           } else {
+            load_misses++;
             total_cycles += (25 * block_size);
           }
           
-          // Update last load time and add a cycle for the read regardless of if there was a hit or a miss
-          total_cycles += 1;
           (*curr_slot).update_load_ts(sim_time);
 
         // If a write is being attempted
@@ -188,5 +188,6 @@ int main(int, char *argv[]) {
     std::cerr << "Store misses: " << store_misses << "\n";
     std::cerr << "Total cycles: " << total_cycles << "\n";
 }
+
 
 #endif
