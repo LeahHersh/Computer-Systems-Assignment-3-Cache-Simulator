@@ -95,20 +95,23 @@ int main(int argc, char *argv[]) {
         // Find the memory address's tag
         int32_t address_tag = (stoul(memory_address, nullptr, 0) >> (num_offset_bits + num_index_bits)) & ((1 << num_tag_bits) - 1);
 
-        int* LRU_chosen;
+        // Make an int pointer that will be updated to the least-recently-accessed slot's index
+        int* LRU_chosen_index;
         std::cerr << "current line's index: " << address_index << std::endl;
         std::cerr << "current line's tag: " << address_tag << std::endl;
 
         // Find the slot being accessed
         Slot* curr_slot;
-        int slot_index = find_curr_slot(cache, address_index, address_tag, LRU_chosen);
+        bool block_in_cache = false;
+        int slot_index = find_curr_slot(cache, address_index, address_tag, LRU_chosen_index);
         // if the slot was in the cache
         if (slot_index != -1) {
           curr_slot = &(cache->sets[address_index].slots[slot_index]);
           (*curr_slot).tag = address_tag;
           (*curr_slot).valid = true;
+          block_in_cache = true;
         } else {
-          curr_slot = &(cache->sets[address_index].slots[*LRU_chosen]);
+          curr_slot = &(cache->sets[address_index].slots[*LRU_chosen_index]);
           std::cerr << "Matching slot not found\n";
         }
 
@@ -119,7 +122,7 @@ int main(int argc, char *argv[]) {
         // If a read is being attempted
         if (load_or_store == "l") {  
           // If the current slot is valid and has the same tag as the memory address
-          if ((*curr_slot).valid && (*curr_slot).tag == address_tag) {
+          if (block_in_cache) {
             // The load is successful
             load_hits++;
 
@@ -160,8 +163,6 @@ int main(int argc, char *argv[]) {
     std::cerr<< "Store misses: " << store_misses << "\n";
     std::cerr<< "Total cycles: " << total_cycles << "\n";
 }
-
-
 
 
 #endif
