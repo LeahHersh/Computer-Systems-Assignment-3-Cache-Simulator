@@ -139,8 +139,9 @@ int main(int, char *argv[]) {
 
         // If a write is being attempted
         } else {
-            // If the current slot is valid and has the same tag as the memory address
-            if (block_in_cache) {
+            // If the current slot is valid and has the same tag as the memory address, and every store isn't 
+            // written straight to main memory
+            if (block_in_cache && !(!write_allocate && !write_back)) {
               // The store is successful, and the bit becomes dirty if it wasn't already (in write-backs)
               store_hits++;
               if (write_back) { (*curr_slot).dirty = true; }
