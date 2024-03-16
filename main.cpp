@@ -111,7 +111,7 @@ int main(int, char *argv[]) {
           curr_slot = &(cache->sets[address_index].slots[slot_index]);
           block_in_cache = true;
 
-        // Otherwise, evict the slot favored by LRU
+        // Otherwise, access the slot favored by LRU
         } else {
           curr_slot = &(cache->sets[address_index].slots[LRU_chosen_index]);
         }
