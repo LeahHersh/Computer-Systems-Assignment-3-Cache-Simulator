@@ -9,6 +9,8 @@
 #include <vector>
 
 
+/* Helper methods */
+
 /* Return the index of the slot/assign the slot that would be chosen in an cache that uses LRU */
 int choose_slot_LRU(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_index) {
   Set set = (*cache).sets[index];
@@ -45,6 +47,7 @@ int choose_slot_LRU(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_ind
 void fetch_block_to_cache(Slot* destination, int new_tag, int block_size, int* CPU_cycles) { 
   (*destination).tag = new_tag;
   (*destination).valid = true;
+  (*destination).dirty = false;
   (*CPU_cycles) += (25 * block_size);
 }
 
