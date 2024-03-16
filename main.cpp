@@ -120,11 +120,6 @@ int main(int, char *argv[]) {
         if (load_or_store == "l" || write_allocate) {
           (*curr_slot).tag = address_tag;
           (*curr_slot).valid = true;
-
-          // On a read or a write in write-allocate, fetch the line to the cache
-          if (load_or_store == "l" || (load_or_store == "s" && write_allocate)) {
-            total_cycles += (25 * blocks_per_set);
-          }
         }
         
         /* Start of load or store */
