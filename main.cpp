@@ -106,7 +106,7 @@ int main(int, char *argv[]) {
         int slot_index = find_curr_slot(cache, address_index, address_tag, &LRU_chosen_index);
         bool block_in_cache = false;
 
-        // if the block was in the cache, load/write to curr_slot and set block_in_cache to true
+        // if the block was in the cache, set curr_slot to the block's spot and set block_in_cache to true
         if (slot_index != -1) {
           curr_slot = &(cache->sets[address_index].slots[slot_index]);
           block_in_cache = true;
@@ -116,14 +116,23 @@ int main(int, char *argv[]) {
           curr_slot = &(cache->sets[address_index].slots[LRU_chosen_index]);
         }
 
-        // Update the slot's tag and its validity status
-        (*curr_slot).tag = address_tag;
-        (*curr_slot).valid = true;
+        // Update the slot's tag and its validity depending on write policies
+        if (load_or_store == "l" || write_allocate) {
+          (*curr_slot).tag = address_tag;
+          (*curr_slot).valid = true;
 
+          // On a read or a write in write-allocate, fetch the line to the cache
+          if (load_or_store == "l" || (load_or_store == "s" && write_allocate)) {
+            total_cycles += (25 * blocks_per_set);
+          }
+        }
+        
         /* Start of load or store */
 
         // If a read is being attempted
         if (load_or_store == "l") {  
+
+
           // If the current slot is valid and had the same tag as the memory address's tag
           if (block_in_cache) {
             // The load is successful
@@ -132,7 +141,7 @@ int main(int, char *argv[]) {
             // Otherwise, it's a miss
           } else {
             load_misses++;
-            total_cycles += (25 * block_size);
+            total_cycles += (25 * blocks_per_set);
           }
           
           // Regardless of if there was a hit or miss, update the slot's access time and "update the block"
@@ -154,17 +163,17 @@ int main(int, char *argv[]) {
               // Because an eviction may have taken place, a write-back to memory might be necessary
               if (write_back && (*curr_slot).dirty) {
                 (*curr_slot).dirty = false;
-                total_cycles += (25 * block_size);
+                total_cycles += (25 * blocks_per_set);
               }
 
               // If the cache is write-allocate, it retrieves the new block from main memory before the store
               if (write_allocate) {
-                total_cycles += (25 * block_size);
+                total_cycles += (25 * blocks_per_set);
               } 
               
               // If the cache is write-through, it writes to main memory as well as the cache
               if (!write_back) {
-                total_cycles += (25 * block_size);
+                total_cycles += (25 * blocks_per_set);
               }
 
             }
