@@ -47,7 +47,6 @@ int choose_slot_LRU(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_ind
 void fetch_block_to_cache(Slot* destination, int new_tag, int block_size, int* CPU_cycles) { 
   (*destination).tag = new_tag;
   (*destination).valid = true;
-  (*destination).dirty = false;
   (*CPU_cycles) += (25 * block_size);
 }
 
@@ -139,12 +138,20 @@ int main(int, char *argv[]) {
           curr_slot = &(cache->sets[address_index].slots[LRU_chosen_index]);
         }
 
+        /* Handling evictions and fetches from main memory */
+
+        // Perform an eviction if the cache is write-back and the block was dirty
+        if (slot_index != -1 && (write_back && (*curr_slot).dirty)) { 
+          total_cycles += (25 * block_size); 
+          (*curr_slot).dirty = false;
+        }
+
         // On a read miss or a write miss in a write-allocate cache, fetch the requested block from main memory
         if (slot_index == -1 && (load_or_store == "l" || (load_or_store == "s" && write_allocate))) {
           fetch_block_to_cache(curr_slot, address_tag, block_size, &total_cycles);
         }
         
-        /* Start of load or store */
+        /* Handling loads and stores */
 
         // If a read is being attempted
         if (load_or_store == "l") {  
@@ -165,31 +172,36 @@ int main(int, char *argv[]) {
 
         // If a write is being attempted
         } else {
-            // If the current slot is valid and has the same tag as the memory address
-            if (block_in_cache) {
-              // The store is successful, and the bit becomes dirty if it wasn't already (in write-backs)
-              store_hits++;
-              if (write_back) { (*curr_slot).dirty = true; }
+            
+          // If the current slot had the same tag as the memory address's tag
+          if (block_in_cache) {
+            // The load is successful
+            load_hits++;
 
-              // Otherwise, it's a miss 
-            } else {
-              store_misses++;
-
-              // Because an eviction may have taken place, a write-back to memory might be necessary
-              if (write_back && (*curr_slot).dirty) {
-                (*curr_slot).dirty = false;
-                total_cycles += (25 * block_size);
-              }
-            }
-
-            // Add cycle for a write to the cache regardless of if a hit or miss happened
-            total_cycles++;
-
-            // If the cache is write-through, it writes to main memory as well as the cache
-            if (!write_back) {
-              total_cycles += (25 * block_size);
-            }
+            // Otherwise, it's a miss
+          } else {
+            load_misses++;
           }
+
+            // If the cache is write-back
+            if (write_back) {
+              // Perform the write to the cache only
+              total_cycles++;
+              (*curr_slot).dirty = true;
+
+            // If the cache is write-through and no-write allocate
+            } else if (!write_back && !write_allocate) {
+              // Perform the write to memory only
+              total_cycles += (25 * block_size); 
+
+            // If the cache is write-through and write allocate
+            } else {
+              // Perform the write to memory and the cache
+              total_cycles += (25 * block_size);
+              total_cycles++;
+            }
+
+        }
 
       // Update slot access time and simulation time regardless of if a load or store happened
       (*curr_slot).update_access_ts(sim_time);
