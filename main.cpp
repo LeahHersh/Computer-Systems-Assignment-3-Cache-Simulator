@@ -136,7 +136,7 @@ int main(int, char *argv[]) {
             // Otherwise, it's a miss
           } else {
             load_misses++;
-            total_cycles += (25 * blocks_per_set);
+            total_cycles += (25 * block_size);
           }
           
           // Regardless of if there was a hit or miss, update the slot's access time and "update the block"
@@ -158,17 +158,17 @@ int main(int, char *argv[]) {
               // Because an eviction may have taken place, a write-back to memory might be necessary
               if (write_back && (*curr_slot).dirty) {
                 (*curr_slot).dirty = false;
-                total_cycles += (25 * blocks_per_set);
+                total_cycles += (25 * block_size);
               }
 
               // If the cache is write-allocate, it retrieves the new block from main memory before the store
               if (write_allocate) {
-                total_cycles += (25 * blocks_per_set);
+                total_cycles += (25 * block_size);
               } 
               
               // If the cache is write-through, it writes to main memory as well as the cache
               if (!write_back) {
-                total_cycles += (25 * blocks_per_set);
+                total_cycles += (25 * block_size);
               }
 
             }
