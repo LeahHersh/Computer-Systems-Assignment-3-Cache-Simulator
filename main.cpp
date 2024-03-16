@@ -106,7 +106,7 @@ int main(int, char *argv[]) {
         int slot_index = find_curr_slot(cache, address_index, address_tag, &LRU_chosen_index);
         bool block_in_cache = false;
 
-        // if the block was in the cache, set curr_slot to the block's spot and set block_in_cache to true
+        // if the block was in the cache, access the block's spot and set block_in_cache to true
         if (slot_index != -1) {
           curr_slot = &(cache->sets[address_index].slots[slot_index]);
           block_in_cache = true;
@@ -141,7 +141,6 @@ int main(int, char *argv[]) {
             // Otherwise, it's a miss
           } else {
             load_misses++;
-            total_cycles += (25 * block_size);
           }
           
           // Regardless of if there was a hit or miss, update the slot's access time and "update the block"
