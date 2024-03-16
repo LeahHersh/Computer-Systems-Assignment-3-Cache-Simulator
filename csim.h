@@ -19,7 +19,6 @@ struct Slot {
 
 struct Set {
   std::vector<Slot> slots;
-  // might need to add a map later, std::map<uint32_t, Slot *> index;
 };
 
 struct Cache {

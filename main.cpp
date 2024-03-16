@@ -72,7 +72,7 @@ int num_sets) {
 int main(int, char *argv[]) {
     int sim_time = 0;
 
-    // Assign command-line arguments to variables
+    // Assign the command-line arguments to variables
     int num_sets = atoi(argv[1]);
     int blocks_per_set = atoi(argv[2]);
     int block_size = atoi(argv[3]);
