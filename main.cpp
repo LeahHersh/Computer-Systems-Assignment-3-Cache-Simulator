@@ -117,9 +117,14 @@ int main(int, char *argv[]) {
         }
 
         // Update the slot's tag and its validity depending on write policies
-        if (load_or_store == "l" || write_allocate) {
+        if (load_or_store == "l" || load_or_store == "s" && write_allocate) {
           (*curr_slot).tag = address_tag;
           (*curr_slot).valid = true;
+
+          // If there was a read miss or a write-allocate write, bring block into the cache from main memory
+          if ((load_or_store == "l" && slot_index == -1) || (load_or_store == "s" && write_allocate)) {
+            total_cycles += (25 * block_size);
+          }
         }
         
         /* Start of load or store */
@@ -160,11 +165,6 @@ int main(int, char *argv[]) {
                 (*curr_slot).dirty = false;
                 total_cycles += (25 * block_size);
               }
-
-              // If the cache is write-allocate, it retrieves the new block from main memory before the store
-              if (write_allocate) {
-                total_cycles += (25 * block_size);
-              } 
             }
 
             // Add cycle for a write to the cache regardless of if a hit or miss happened
