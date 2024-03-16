@@ -9,19 +9,20 @@
 #include <vector>
 
 
-int find_curr_slot(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_index) {
+/* Return the index of the slot/assign the slot that would be chosen in an cache that uses LRU */
+int choose_slot_LRU(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_index) {
   Set set = (*cache).sets[index];
 
   // Set up variables for keeping track of which slot has been accessed least recently
   int oldest_access = set.slots[0].access_ts;
   int oldest_use_index = 0; 
-  int num_slots = set.slots.size();
 
   // Find slot with a matching tag or the oldest access date
+  int num_slots = set.slots.size();
   for (int i = 0; i < num_slots; i++) {
     Slot* curr = &(set.slots[i]);
 
-    // If a slot with a matching tag was found, return that tag
+    // If a slot with a matching tag was found, return the index of the slot with that tag
     if ((*curr).tag == tag) {
       return i;
     }
@@ -32,13 +33,20 @@ int find_curr_slot(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_inde
       oldest_access = (*curr).access_ts;
     }
   }
-
   // Assign the LRU-chosen slot, so that it can be written to or evicted
   *LRU_slot_index = oldest_use_index;
 
   // Indicate that no slots with a matching tag were found in the set
   return -1;
 }
+
+
+void fetch_block_to_cache(Slot* destination, int new_tag, int block_size, int* CPU_cycles) { 
+  (*destination).tag = new_tag;
+  (*destination).valid = true;
+  (*CPU_cycles) += (25 * block_size);
+}
+
 
 
 int main(int, char *argv[]) {
@@ -103,7 +111,7 @@ int main(int, char *argv[]) {
 
         // Find the slot being accessed
         Slot* curr_slot;
-        int slot_index = find_curr_slot(cache, address_index, address_tag, &LRU_chosen_index);
+        int slot_index = choose_slot_LRU(cache, address_index, address_tag, &LRU_chosen_index);
         bool block_in_cache = false;
 
         // if the block was in the cache, set curr_slot to the block's spot and set block_in_cache to true
@@ -116,11 +124,9 @@ int main(int, char *argv[]) {
           curr_slot = &(cache->sets[address_index].slots[LRU_chosen_index]);
         }
 
-        // On a read miss or a write-allocate write miss, fetch the requested block from main memory
+        // On a read miss or a write miss in a write-allocate cache, fetch the requested block from main memory
         if (slot_index == -1 && (load_or_store == "l" || (load_or_store == "s" && write_allocate))) {
-          (*curr_slot).tag = address_tag;
-          (*curr_slot).valid = true;
-          total_cycles += (25 * block_size);
+          fetch_block_to_cache(curr_slot, address_tag, block_size, &total_cycles);
         }
         
         /* Start of load or store */
@@ -128,7 +134,7 @@ int main(int, char *argv[]) {
         // If a read is being attempted
         if (load_or_store == "l") {  
 
-          // If the current slot is valid and had the same tag as the memory address's tag
+          // If the current slot had the same tag as the memory address's tag
           if (block_in_cache) {
             // The load is successful
             load_hits++;
