@@ -106,7 +106,7 @@ int main(int, char *argv[]) {
         int slot_index = find_curr_slot(cache, address_index, address_tag, &LRU_chosen_index);
         bool block_in_cache = false;
 
-        // if the block was in the cache, access the block's spot and set block_in_cache to true
+        // if the block was in the cache, set curr_slot to the block's spot and set block_in_cache to true
         if (slot_index != -1) {
           curr_slot = &(cache->sets[address_index].slots[slot_index]);
           block_in_cache = true;
@@ -116,22 +116,17 @@ int main(int, char *argv[]) {
           curr_slot = &(cache->sets[address_index].slots[LRU_chosen_index]);
         }
 
-        // Update the slot's tag and its validity depending on write policies
-        if (load_or_store == "l" || load_or_store == "s" && write_allocate) {
+        // On a read miss or a write-allocate write, move block from main memory into the chosen slot
+        if (load_or_store == "l" && slot_index == -1 || load_or_store == "s" && write_allocate) {
           (*curr_slot).tag = address_tag;
           (*curr_slot).valid = true;
-
-          // If there was a read miss or a write-allocate write, bring block into the cache from main memory
-          if ((load_or_store == "l" && slot_index == -1) || (load_or_store == "s" && write_allocate)) {
-            total_cycles += (25 * block_size);
-          }
+          total_cycles += (25 * block_size);
         }
         
         /* Start of load or store */
 
         // If a read is being attempted
         if (load_or_store == "l") {  
-
 
           // If the current slot is valid and had the same tag as the memory address's tag
           if (block_in_cache) {
@@ -164,6 +159,11 @@ int main(int, char *argv[]) {
                 (*curr_slot).dirty = false;
                 total_cycles += (25 * block_size);
               }
+
+              // If the cache is write-allocate, it retrieves the new block from main memory before the store
+              if (write_allocate) {
+                total_cycles += (25 * block_size);
+              } 
             }
 
             // Add cycle for a write to the cache regardless of if a hit or miss happened
