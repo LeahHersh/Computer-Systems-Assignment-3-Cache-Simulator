@@ -120,7 +120,7 @@ int main(int, char *argv[]) {
         (*curr_slot).tag = address_tag;
         (*curr_slot).valid = true;
 
-        /* Start of load/store */
+        /* Start of load or store */
 
         // If a read is being attempted
         if (load_or_store == "l") {  
