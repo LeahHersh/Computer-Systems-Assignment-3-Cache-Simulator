@@ -41,10 +41,27 @@ int choose_slot_LRU(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_ind
 }
 
 
+/* Simulate bringing a block from main memory into a cache slot */
 void fetch_block_to_cache(Slot* destination, int new_tag, int block_size, int* CPU_cycles) { 
   (*destination).tag = new_tag;
   (*destination).valid = true;
   (*CPU_cycles) += (25 * block_size);
+}
+
+
+/* Find an input memory address's index and tag, and assign them to the appropriate pointers' values */
+void calculate_address_index_and_tag(std::string memory_address, uint32_t* address_index, uint32_t* address_tag, int block_size, 
+int num_sets) {
+
+  // Calculate memory address's number of offset, index, and tag bits 
+  int num_offset_bits = log2(block_size);
+  int num_index_bits = log2(num_sets);
+  int num_tag_bits = 32 - num_offset_bits - num_index_bits;
+
+  // Find the memory address's index
+  (*address_index) = (stoul(memory_address, nullptr, 0) >> num_offset_bits) & ((1 << num_index_bits) - 1);
+  // Find the memory address's tag
+  (*address_tag) = (stoul(memory_address, nullptr, 0) >> (num_offset_bits + num_index_bits)) & ((1 << num_tag_bits) - 1);
 }
 
 
@@ -96,16 +113,11 @@ int main(int, char *argv[]) {
         std::string ignored;
         ss >> load_or_store >> memory_address >> ignored;
 
-        // Calculate memory address's number of offset, index, and tag bits 
-        int num_offset_bits = log2(block_size);
-        int num_index_bits = log2(num_sets);
-        int num_tag_bits = 32 - num_offset_bits - num_index_bits;
-
-        // Find the memory address's index
-        uint32_t address_index = (stoul(memory_address, nullptr, 0) >> num_offset_bits) & ((1 << num_index_bits) - 1);
-        // Find the memory address's tag
-        int32_t address_tag = (stoul(memory_address, nullptr, 0) >> (num_offset_bits + num_index_bits)) & ((1 << num_tag_bits) - 1);
-
+        // Calculate the memory address's index and tag:
+        uint32_t address_index = 0;
+        uint32_t address_tag = 0;
+        calculate_address_index_and_tag(memory_address, &address_index, &address_tag, block_size, num_sets);
+        
         // int that will be updated to the least-recently-accessed slot's index if no match is found
         int LRU_chosen_index = 0;
 
