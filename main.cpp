@@ -116,8 +116,8 @@ int main(int, char *argv[]) {
           curr_slot = &(cache->sets[address_index].slots[LRU_chosen_index]);
         }
 
-        // On a read miss or a write-allocate write, move block from main memory into the chosen slot
-        if (load_or_store == "l" && slot_index == -1 || load_or_store == "s" && write_allocate) {
+        // On a read miss or a write-allocate write, move the requested block from main memory into the chosen slot
+        if (slot_index == -1 && (load_or_store == "l" || (load_or_store == "s" && write_allocate))) {
           (*curr_slot).tag = address_tag;
           (*curr_slot).valid = true;
           total_cycles += (25 * block_size);
@@ -138,7 +138,7 @@ int main(int, char *argv[]) {
             load_misses++;
           }
           
-          // Regardless of if there was a hit or miss, update the slot's access time and "update the block"
+          // Regardless of if there was a hit or miss, update the slot's access time and "load the block"
           (*curr_slot).update_load_ts(sim_time);
           total_cycles += 1;
 
