@@ -43,6 +43,38 @@ int choose_slot_LRU(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_ind
 }
 
 
+/* Return the index of the slot/assign the slot that would be chosen in an cache that uses FIFO */
+int choose_slot_FIFO(Cache* cache, uint32_t index, int32_t tag, int* FIFO_slot_index) {
+  Set set = (*cache).sets[index];
+
+  // Set up variables for keeping track of which slot has been loaded least recently
+  int oldest_load = set.slots[0].load_ts;
+  int oldest_load_index = 0; 
+
+  // Find slot with a matching tag or the oldest load date
+  int num_slots = set.slots.size();
+  for (int i = 0; i < num_slots; i++) {
+    Slot* curr = &(set.slots[i]);
+
+    // If a slot with a matching tag was found, return the index of the slot with that tag
+    if ((*curr).tag == tag) {
+      return i;
+    }
+
+    // Update which slot has the oldest load date if curr is "older"
+    if ((*curr).load_ts < oldest_load) { 
+      oldest_load_index = i;
+      oldest_load = (*curr).load_ts;
+    }
+  }
+  // Assign the FIFO-chosen slot, so that it can be written to or evicted
+  *FIFO_slot_index = oldest_load_index;
+
+  // Indicate that no slots with a matching tag were found in the set
+  return -1;
+}
+
+
 /* Simulate bringing a block from main memory into a cache slot */
 void fetch_block_to_cache(Slot* destination, int new_tag, int block_size, int* CPU_cycles) { 
   (*destination).tag = new_tag;
@@ -67,12 +99,10 @@ int num_sets) {
 }
 
 
-
 int main(int, char *argv[]) {
     int sim_time = 0;
 
     // Assign command-line arguments to variables
-    // Assign the command-line arguments to variables
     int num_sets = atoi(argv[1]);
     int blocks_per_set = atoi(argv[2]);
     int block_size = atoi(argv[3]);
@@ -139,14 +169,8 @@ int main(int, char *argv[]) {
           curr_slot = &(cache->sets[address_index].slots[LRU_chosen_index]);
         }
 
-        // Because an eviction may have taken place, a write-back to memory might be necessary
-        if (slot_index != -1 && (write_back && (*curr_slot).dirty)) {
-          (*curr_slot).dirty = false;
-          total_cycles += (25 * block_size);
-        }
-
-        // On a read miss or a write miss in a write-allocate cache, fetch the requested block from main memory
-        if (slot_index == -1 && (load_or_store == "l" || (load_or_store == "s" && write_allocate))) {
+        // On a read miss or on a write miss in a write-allocate cache, fetch the requested block from main memory
+        if (load_or_store == "l" || write_allocate) {
           fetch_block_to_cache(curr_slot, address_tag, block_size, &total_cycles);
         }
         
@@ -180,6 +204,12 @@ int main(int, char *argv[]) {
               // Otherwise, it's a miss 
             } else {
               store_misses++;
+
+              // Because an eviction may have taken place, a write-back to memory might be necessary
+              if (write_back && (*curr_slot).dirty) {
+                (*curr_slot).dirty = false;
+                total_cycles += (25 * block_size);
+              }
             }
 
             // Add cycle for a write to the cache regardless of if a hit or miss happened
