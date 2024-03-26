@@ -153,10 +153,18 @@ int main(int, char *argv[]) {
         
         // int that will be updated to the least-recently-accessed slot's index if no match is found
         int LRU_chosen_index = 0;
+        int FIFO_chosen_index = 0;
 
         // Find the slot being accessed
         Slot* curr_slot;
-        int slot_index = choose_slot_LRU(cache, address_index, address_tag, &LRU_chosen_index);
+        int slot_index;
+
+        if (eviction_policy == "LRU") { 
+          slot_index = choose_slot_LRU(cache, address_index, address_tag, &LRU_chosen_index);
+        } else {
+          slot_index = choose_slot_FIFO(cache, address_index, address_tag, &FIFO_chosen_index);
+        }
+        
         bool block_in_cache = false;
 
         // if the block was in the cache, set curr_slot to the block's spot and set block_in_cache to true
@@ -164,9 +172,9 @@ int main(int, char *argv[]) {
           curr_slot = &(cache->sets[address_index].slots[slot_index]);
           block_in_cache = true;
 
-        // Otherwise, access the slot favored by LRU
+        // Otherwise, access the slot favored by LRU or FIFO
         } else {
-          curr_slot = &(cache->sets[address_index].slots[LRU_chosen_index]);
+          eviction_policy == "LRU" ? &(cache->sets[address_index].slots[LRU_chosen_index]) : &(cache->sets[address_index].slots[FIFO_chosen_index]);
         }
 
         // On a read miss or on a write miss in a write-allocate cache, fetch the requested block from main memory
