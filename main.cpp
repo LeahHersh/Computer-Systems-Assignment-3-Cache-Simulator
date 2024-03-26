@@ -159,7 +159,7 @@ int main(int, char *argv[]) {
         Slot* curr_slot;
         int slot_index;
 
-        if (eviction_policy == "LRU") { 
+        if (eviction_policy == "lru") { 
           slot_index = choose_slot_LRU(cache, address_index, address_tag, &LRU_chosen_index);
         } else {
           slot_index = choose_slot_FIFO(cache, address_index, address_tag, &FIFO_chosen_index);
@@ -172,9 +172,9 @@ int main(int, char *argv[]) {
           curr_slot = &(cache->sets[address_index].slots[slot_index]);
           block_in_cache = true;
 
-        // Otherwise, access the slot favored by LRU or FIFO
+        // Otherwise, access the slot favored by LRU or FIFO respectively
         } else {
-          eviction_policy == "LRU" ? &(cache->sets[address_index].slots[LRU_chosen_index]) : &(cache->sets[address_index].slots[FIFO_chosen_index]);
+          curr_slot = eviction_policy == "lru" ? &(cache->sets[address_index].slots[LRU_chosen_index]) : &(cache->sets[address_index].slots[FIFO_chosen_index]);
         }
 
         // On a read miss or on a write miss in a write-allocate cache, fetch the requested block from main memory
