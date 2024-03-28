@@ -76,10 +76,10 @@ int choose_slot_FIFO(Cache* cache, uint32_t index, int32_t tag, int* FIFO_slot_i
 
 
 /* Simulate bringing a block from main memory into a cache slot */
-void fetch_block_to_cache(Slot* destination, int new_tag, int block_size, int* CPU_cycles) { 
+void fetch_block_to_cache(Slot* destination, int new_tag, int blocks_per_set, int* CPU_cycles) { 
   (*destination).tag = new_tag;
   (*destination).valid = true;
-  (*CPU_cycles) += (25 * block_size);
+  (*CPU_cycles) += (25 * blocks_per_set);
 }
 
 
@@ -179,7 +179,7 @@ int main(int, char *argv[]) {
 
         // On a read miss or on a write miss in a write-allocate cache, fetch the requested block from main memory
         if (load_or_store == "l" || write_allocate) {
-          fetch_block_to_cache(curr_slot, address_tag, block_size, &total_cycles);
+          fetch_block_to_cache(curr_slot, address_tag, blocks_per_set, &total_cycles);
         }
         
         /* Start of load or store */
@@ -216,7 +216,7 @@ int main(int, char *argv[]) {
               // Because an eviction may have taken place, a write-back to memory might be necessary
               if (write_back && (*curr_slot).dirty) {
                 (*curr_slot).dirty = false;
-                total_cycles += (25 * block_size);
+                total_cycles += (25 * blocks_per_set);
               }
             }
 
@@ -225,7 +225,7 @@ int main(int, char *argv[]) {
 
             // If the cache is write-through, it writes to main memory as well as the cache
             if (!write_back) {
-              total_cycles += (25 * block_size);
+              total_cycles += (25 * blocks_per_set);
             }
           }
 
