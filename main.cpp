@@ -181,6 +181,11 @@ int main(int, char *argv[]) {
         if (slot_index == -1 && (load_or_store == "l" || write_allocate)) {
           fetch_block_to_cache(curr_slot, address_tag, block_size, &total_cycles);
 
+          if (write_back && (*curr_slot).dirty) {
+            (*curr_slot).dirty = false;
+            total_cycles += (25 * block_size);
+          }
+
           // On a write miss, set the bit to dirty in a write-back cache 
           if (load_or_store == "w" && write_back) { curr_slot->dirty = true; }
         }
@@ -216,11 +221,8 @@ int main(int, char *argv[]) {
             } else {
               store_misses++;
 
-              // Because an eviction may have taken place, a write-back to memory might be necessary
-              if (write_back && (*curr_slot).dirty) {
-                (*curr_slot).dirty = false;
-                total_cycles += (25 * block_size);
-              }
+              // Because an eviction may have taken place, a write-back to memory might be necessary TODO
+              
             }
 
             // Add cycle for a write to the cache regardless of if a hit or miss happened
