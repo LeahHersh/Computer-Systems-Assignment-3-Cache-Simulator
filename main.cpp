@@ -178,7 +178,7 @@ int main(int, char *argv[]) {
         }
 
         // On a read miss or on a write miss in a write-allocate cache, fetch the requested block from main memory
-        if (load_or_store == "l" || write_allocate) {
+        if (slot_index == -1 && (load_or_store == "l" || write_allocate)) {
           fetch_block_to_cache(curr_slot, address_tag, block_size, &total_cycles);
         }
         
