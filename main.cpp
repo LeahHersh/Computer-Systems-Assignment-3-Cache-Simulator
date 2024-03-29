@@ -218,7 +218,7 @@ int main(int, char *argv[]) {
 
                 // Write the block being evicted to main memory if the block was dirty and the cache is write-back
                 if (write_back && (*curr_slot).dirty) {
-                  (*curr_slot).dirty = false;
+                  (*curr_slot).dirty = true;
                   total_cycles += (25 * block_size);
                 }
               }
