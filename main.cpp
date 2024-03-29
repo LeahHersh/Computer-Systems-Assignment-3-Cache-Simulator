@@ -229,7 +229,7 @@ int main(int, char *argv[]) {
 
             // If the cache is write-through, it writes to main memory as well as the cache
             if (!write_back) {
-              total_cycles += (25 * block_size);
+              total_cycles += 100;
             }
 
             // If the cache is write-through, the bit becomes dirty if it wasn't already
