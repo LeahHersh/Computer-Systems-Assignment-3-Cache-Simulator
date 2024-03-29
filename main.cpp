@@ -76,9 +76,10 @@ int choose_slot_FIFO(Cache* cache, uint32_t index, int32_t tag, int* FIFO_slot_i
 
 
 /* Simulate bringing a block from main memory into a cache slot */
-void fetch_block_to_cache(Slot* destination, int new_tag, int block_size, int* CPU_cycles) { 
+void fetch_block_to_cache(Slot* destination, int new_tag, int block_size, int* CPU_cycles, int curr_time) { 
   (*destination).tag = new_tag;
   (*destination).valid = true;
+  (*destination).load_ts = curr_time;
   (*CPU_cycles) += (25 * block_size);
 }
 
@@ -176,22 +177,6 @@ int main(int, char *argv[]) {
         } else {
           curr_slot = eviction_policy == "lru" ? &(cache->sets[address_index].slots[LRU_chosen_index]) : &(cache->sets[address_index].slots[FIFO_chosen_index]);
         }
-
-        // On a read miss or on a write miss in a write-allocate cache, fetch the requested block from main memory and update its timestamps
-        if (slot_index == -1 && (load_or_store == "l" || write_allocate)) {
-          fetch_block_to_cache(curr_slot, address_tag, block_size, &total_cycles);
-          curr_slot->update_load_ts(sim_time);
-          curr_slot->update_access_ts(sim_time);
-
-          // Write the block being evicted to main memory if the block was dirty and the cache is write-back
-          if (write_back && (*curr_slot).dirty) {
-            (*curr_slot).dirty = false;
-            total_cycles += (25 * block_size);
-          }
-
-          // On a write miss, set the bit to dirty in a write-back cache 
-          if (load_or_store == "w" && write_back) { curr_slot->dirty = true; }
-        }
         
         /* Start of load or store */
 
@@ -202,14 +187,19 @@ int main(int, char *argv[]) {
           if (block_in_cache) {
             // The load is successful
             load_hits++;
+            total_cycles++;
 
             // Otherwise, it's a miss
           } else {
             load_misses++;
+            fetch_block_to_cache(curr_slot, address_tag, block_size, &total_cycles, sim_time);
+
+            // Write the block being evicted to main memory if the block was dirty and the cache is write-back
+            if (write_back && (*curr_slot).dirty) {
+              (*curr_slot).dirty = false;
+              total_cycles += (25 * block_size);
+            }
           }
-          
-          // Regardless of if there was a hit or miss, "load the block" from the cache
-          total_cycles += 1;
 
         // If a write is being attempted
         } else {
@@ -222,6 +212,16 @@ int main(int, char *argv[]) {
               // Otherwise, it's a miss 
             } else {
               store_misses++;
+
+              if (write_allocate) {
+                fetch_block_to_cache(curr_slot, address_tag, block_size, &total_cycles, sim_time);
+
+                // Write the block being evicted to main memory if the block was dirty and the cache is write-back
+                if (write_back && (*curr_slot).dirty) {
+                  (*curr_slot).dirty = false;
+                  total_cycles += (25 * block_size);
+                }
+              }
             }
 
             // Add cycle for a write to the cache regardless of if a hit or miss happened
@@ -231,9 +231,12 @@ int main(int, char *argv[]) {
             if (!write_back) {
               total_cycles += (25 * block_size);
             }
+
+            // If the cache is write-through, the bit becomes dirty if it wasn't already
+            if (write_back) { (*curr_slot).dirty = true; }
           }
 
-      // Update simulation time regardless of if a load or store happened
+      // Update simulation time and access time regardless of if a load or store happened
       curr_slot->update_access_ts(sim_time);
       sim_time++;
     }
