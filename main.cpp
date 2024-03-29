@@ -219,7 +219,7 @@ int main(int, char *argv[]) {
 
               if (write_allocate) {
                 fetch_block_to_cache(curr_slot, address_tag, block_size, &total_cycles, sim_time);
-                (*curr_slot).dirty = false; 
+                (*curr_slot).dirty = true; 
 
                 // Write the block being evicted to main memory if the block was dirty and the cache is write-back
                 if (write_back && (*curr_slot).dirty) {
