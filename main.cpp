@@ -177,10 +177,13 @@ int main(int, char *argv[]) {
           curr_slot = eviction_policy == "lru" ? &(cache->sets[address_index].slots[LRU_chosen_index]) : &(cache->sets[address_index].slots[FIFO_chosen_index]);
         }
 
-        // On a read miss or on a write miss in a write-allocate cache, fetch the requested block from main memory
+        // On a read miss or on a write miss in a write-allocate cache, fetch the requested block from main memory and update its timestamps
         if (slot_index == -1 && (load_or_store == "l" || write_allocate)) {
           fetch_block_to_cache(curr_slot, address_tag, block_size, &total_cycles);
+          curr_slot->update_load_ts(sim_time);
+          curr_slot->update_access_ts(sim_time);
 
+          // Write the block being evicted to main memory if the block was dirty and the cache is write-back
           if (write_back && (*curr_slot).dirty) {
             (*curr_slot).dirty = false;
             total_cycles += (25 * block_size);
@@ -205,8 +208,7 @@ int main(int, char *argv[]) {
             load_misses++;
           }
           
-          // Regardless of if there was a hit or miss, update the slot's access time and "load the block"
-          (*curr_slot).update_load_ts(sim_time);
+          // Regardless of if there was a hit or miss, "load the block"
           total_cycles += 1;
 
         // If a write is being attempted
@@ -220,9 +222,6 @@ int main(int, char *argv[]) {
               // Otherwise, it's a miss 
             } else {
               store_misses++;
-
-              // Because an eviction may have taken place, a write-back to memory might be necessary TODO
-              
             }
 
             // Add cycle for a write to the cache regardless of if a hit or miss happened
@@ -234,7 +233,7 @@ int main(int, char *argv[]) {
             }
           }
 
-      // Update slot access time and simulation time regardless of if a load or store happened
+      // Update simulation time regardless of if a load or store happened
       (*curr_slot).update_access_ts(sim_time);
       sim_time++;
     }
