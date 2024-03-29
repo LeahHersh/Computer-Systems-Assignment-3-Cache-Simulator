@@ -225,7 +225,7 @@ int main(int, char *argv[]) {
             }
 
             // Add cycle for a write to the cache regardless of if a hit or miss happened
-            total_cycles++;
+            total_cycles+=2;
 
             // If the cache is write-through, it writes to main memory as well as the cache
             if (!write_back) {
