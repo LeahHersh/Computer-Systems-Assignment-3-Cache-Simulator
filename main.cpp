@@ -208,7 +208,7 @@ int main(int, char *argv[]) {
             load_misses++;
           }
           
-          // Regardless of if there was a hit or miss, "load the block"
+          // Regardless of if there was a hit or miss, "load the block" from the cache
           total_cycles += 1;
 
         // If a write is being attempted
@@ -234,7 +234,7 @@ int main(int, char *argv[]) {
           }
 
       // Update simulation time regardless of if a load or store happened
-      (*curr_slot).update_access_ts(sim_time);
+      curr_slot->update_access_ts(sim_time);
       sim_time++;
     }
 
