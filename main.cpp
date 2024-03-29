@@ -207,7 +207,11 @@ int main(int, char *argv[]) {
             if (block_in_cache) {
               // The store is successful, and the bit becomes dirty if it wasn't already (in write-backs)
               store_hits++;
-              if (write_back) { (*curr_slot).dirty = true; }
+
+              if (write_back) { 
+                (*curr_slot).dirty = true; 
+                total_cycles++;
+              }
 
               // Otherwise, it's a miss 
             } else {
@@ -215,6 +219,7 @@ int main(int, char *argv[]) {
 
               if (write_allocate) {
                 fetch_block_to_cache(curr_slot, address_tag, block_size, &total_cycles, sim_time);
+                (*curr_slot).dirty = false; 
 
                 // Write the block being evicted to main memory if the block was dirty and the cache is write-back
                 if (write_back && (*curr_slot).dirty) {
@@ -224,12 +229,9 @@ int main(int, char *argv[]) {
               }
             }
 
-            // Add cycle for a write to the cache regardless of if a hit or miss happened
-            total_cycles+=2;
-
             // If the cache is write-through, it writes to main memory as well as the cache
             if (!write_back) {
-              total_cycles += 101;
+              total_cycles += 100;
             }
 
             // If the cache is write-through, the bit becomes dirty if it wasn't already
