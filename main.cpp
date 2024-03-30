@@ -183,7 +183,7 @@ int main(int, char *argv[]) {
           curr_slot = &(cache->sets[address_index].slots[slot_index]);
           block_in_cache = true;
 
-        // Otherwise, access the slot favored by LRU or FIFO respectively
+        // Otherwise, access the slot favored by LRU or FIFO respectively depending on the cache
         } else {
           curr_slot = eviction_policy == "lru" ? &(cache->sets[address_index].slots[LRU_chosen_index]) : &(cache->sets[address_index].slots[FIFO_chosen_index]);
         }
@@ -218,13 +218,16 @@ int main(int, char *argv[]) {
         } else {
             // If the current slot is valid and has the same tag as the memory address
             if (block_in_cache) {
-              // The store is successful, and the bit becomes dirty if it wasn't already (in write-backs)
+              // The store is successful, and the bit becomes dirty if it wasn't already (in write-backs).
               store_hits++;
 
               if (write_back) { 
                 (*curr_slot).dirty = true; 
                 total_cycles++;
               }
+
+              // Because the slot was hit/accessed, its access time needs to be updated
+              curr_slot->update_access_ts(sim_time);
 
               // Otherwise, it's a miss 
             } else {
