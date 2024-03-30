@@ -34,7 +34,7 @@ int choose_slot_LRU(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_ind
       return i;
     }
 
-    // Update which slot has the oldest access date if curr is "older"
+    // Update which slot has the oldest access date if curr is older
     if ((*curr).access_ts < oldest_access) { 
       oldest_use_index = i;
       oldest_access = (*curr).access_ts;
@@ -211,6 +211,9 @@ int main(int, char *argv[]) {
             }
           }
 
+          // Update the access time regardless of if a hit or a miss happened
+          curr_slot->update_access_ts(sim_time);
+
         // If a write is being attempted
         } else {
             // If the current slot is valid and has the same tag as the memory address
@@ -234,10 +237,11 @@ int main(int, char *argv[]) {
                   total_cycles += (25 * block_size);
                 }
 
-                // Fetch the requested block from main memory, then write to it, making it dirty
+                // Fetch the requested block from main memory, then write to it, making it dirty. Update its access time.
                 fetch_block_to_cache(curr_slot, address_tag, block_size, &total_cycles, sim_time);
                 total_cycles++;
                 (*curr_slot).dirty = true;  
+                curr_slot->update_access_ts(sim_time);
               }
             }
 
@@ -247,8 +251,7 @@ int main(int, char *argv[]) {
             }
           }
 
-      // Update access time and simulation time regardless of if a load or store happened
-      curr_slot->update_access_ts(sim_time);
+      // Update simulation time
       sim_time++;
     }
 
