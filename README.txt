@@ -6,6 +6,6 @@ Only csim and a main file is part of the executable.
 The simulator's cycle count isn't always accurate, and I think write-throughs might not be handled correctly.
 
 ### Milestone 3 Implementation Details:
-
+Slots' 
 
 Cache Report 

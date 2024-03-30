@@ -88,7 +88,6 @@ int choose_slot_FIFO(Cache* cache, uint32_t index, int32_t tag, int* FIFO_slot_i
 /* Simulate bringing a block from main memory into a cache slot */
 void fetch_block_to_cache(Slot* destination, int new_tag, int block_size, int* CPU_cycles, int curr_time) { 
   (*destination).tag = new_tag;
-  (*destination).valid = true;
   (*destination).load_ts = curr_time;
   (*CPU_cycles) += (25 * block_size);
 }
@@ -134,7 +133,7 @@ int main(int, char *argv[]) {
     cache->sets.resize(num_sets);
     for (int j = 0; j < num_sets; j++) {
       // Each slot is initialized with an invalid tag, to clean/invalid, and as unaccessed/never loaded
-      cache->sets[j].slots.resize(blocks_per_set, {-1, false, false, -1, -1});
+      cache->sets[j].slots.resize(blocks_per_set, {-1, false, -1, -1});
     }
 
     // Set up results variables:
@@ -193,7 +192,7 @@ int main(int, char *argv[]) {
         // If a read is being attempted
         if (load_or_store == "l") {  
 
-          // If the current slot had the same tag as the memory address's tag
+          // If the current slot has the same tag as the memory address requested by the CPU 
           if (block_in_cache) {
             // The load is successful
             load_hits++;
@@ -216,7 +215,7 @@ int main(int, char *argv[]) {
 
         // If a write is being attempted
         } else {
-            // If the current slot is valid and has the same tag as the memory address
+            // If the current slot has the same tag as the memory address requested by the CPU 
             if (block_in_cache) {
               // The store is successful, and the bit becomes dirty if it wasn't already (in write-backs).
               store_hits++;

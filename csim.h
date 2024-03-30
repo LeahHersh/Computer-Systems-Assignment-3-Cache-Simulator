@@ -7,10 +7,9 @@
 
 struct Slot {
   int32_t tag;
-  bool valid; 
   bool dirty;
-  int load_ts;  // ts of last load
-  int access_ts;  // ts of last store or load
+  int load_ts;  // timestamp of last load
+  int access_ts;  // timestamp of last store or load
 
   void update_load_ts(int new_load_ts) { load_ts = new_load_ts; }
 
