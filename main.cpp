@@ -140,7 +140,7 @@ int main(int, char *argv[]) {
     std::string curr_trace_line;
     while (std::getline(std::cin, curr_trace_line)) {
 
-        // Parse the current input line
+        // Parse the current input line:
         std::istringstream ss(curr_trace_line);
         std::string load_or_store;
         std::string memory_address;
@@ -218,26 +218,26 @@ int main(int, char *argv[]) {
               store_misses++;
 
               if (write_allocate) {
-                fetch_block_to_cache(curr_slot, address_tag, block_size, &total_cycles, sim_time);
-                (*curr_slot).dirty = true; 
 
                 // Write the block being evicted to main memory if the block was dirty and the cache is write-back
                 if (write_back && (*curr_slot).dirty) {
                   total_cycles += (25 * block_size);
                 }
+
+                // Fetch the requested block from main memory, then write to it, making it dirty
+                fetch_block_to_cache(curr_slot, address_tag, block_size, &total_cycles, sim_time);
+                total_cycles++;
+                (*curr_slot).dirty = true;  
               }
             }
 
-            // If the cache is write-through, it writes to main memory as well as the cache
+            // If the cache is write-through, it writes to main memory regardless of if a hit or a miss happened
             if (!write_back) {
               total_cycles += 100;
             }
-
-            // If the cache is write-through, the bit becomes dirty if it wasn't already
-            if (write_back) { (*curr_slot).dirty = true; }
           }
 
-      // Update simulation time and access time regardless of if a load or store happened
+      // Update access time and simulation time regardless of if a load or store happened
       curr_slot->update_access_ts(sim_time);
       sim_time++;
     }
