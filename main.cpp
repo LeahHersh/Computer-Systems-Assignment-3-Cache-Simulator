@@ -11,7 +11,12 @@
 
 /* Helper methods */
 
-/* Return the index of the slot/assign the slot that would be chosen in an cache that uses LRU */
+/* 
+  Return the index of the slot whose tag matches the current tag if it's found, 
+  or assign the slot with the oldest access time to the LRU_slot_index. Note that 
+  if a slot with a matching tag is not found, the first empty slot available will be 
+  returned, as an empty slot's access time is always zero. 
+*/
 int choose_slot_LRU(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_index) {
   Set set = (*cache).sets[index];
 
@@ -43,7 +48,12 @@ int choose_slot_LRU(Cache* cache, uint32_t index, int32_t tag, int* LRU_slot_ind
 }
 
 
-/* Return the index of the slot/assign the slot that would be chosen in an cache that uses FIFO */
+/* 
+  Return the index of the slot whose tag matches the current tag if it's found, 
+  or assign the slot with the oldest load time to the LRU_slot_index. Note that 
+  if a slot with a matching tag is not found, the first empty slot available will be 
+  returned, as an empty slot's load time is always zero. 
+*/
 int choose_slot_FIFO(Cache* cache, uint32_t index, int32_t tag, int* FIFO_slot_index) {
   Set set = (*cache).sets[index];
 
@@ -101,7 +111,7 @@ int num_sets) {
 
 
 int main(int, char *argv[]) {
-    int sim_time = 0;
+    int sim_time = 1;
 
     // Assign command-line arguments to variables
     int num_sets = atoi(argv[1]);
@@ -152,11 +162,11 @@ int main(int, char *argv[]) {
         uint32_t address_tag = 0;
         calculate_address_index_and_tag(memory_address, &address_index, &address_tag, block_size, num_sets);
         
-        // int that will be updated to the least-recently-accessed slot's index if no match is found
+        // int that will be updated to the empty/evicted slot's index if no slot with a matching tag is found:
         int LRU_chosen_index = 0;
         int FIFO_chosen_index = 0;
 
-        // Find the slot being accessed
+        // Find the slot being accessed. If a slot with a matching tag is found, this slot will always be chosen:
         Slot* curr_slot;
         int slot_index;
 
