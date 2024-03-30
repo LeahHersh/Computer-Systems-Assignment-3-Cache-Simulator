@@ -111,7 +111,7 @@ int num_sets) {
 
 
 int main(int, char *argv[]) {
-    int sim_time = 1;
+    int sim_time = 0;
 
     // Assign command-line arguments to variables
     int num_sets = atoi(argv[1]);
@@ -134,7 +134,7 @@ int main(int, char *argv[]) {
     cache->sets.resize(num_sets);
     for (int j = 0; j < num_sets; j++) {
       // Each slot is initialized with an invalid tag, to clean/invalid, and as unaccessed/never loaded
-      cache->sets[j].slots.resize(blocks_per_set, {-1, false, false, 0, 0});
+      cache->sets[j].slots.resize(blocks_per_set, {-1, false, false, -1, -1});
     }
 
     // Set up results variables:
