@@ -1,7 +1,7 @@
 # Initialize the field of input
-f1=(1 4 16 64)
-f2=(1 4 16 64)
-f3=(4 32 128)
+f1=(256 256 256 256 256 256)
+f2=(1 2 4 8 256 4)
+f3=(16 16 16 16 16 4)
 f6=("lru" "fifo")
 f7=("gcc.trace" "swim.trace")
 ctt=1
