@@ -189,3 +189,4 @@ Load misses: 2700
 Store hits: 57994
 Store misses: 24531
 Total cycles: 9550468
+
