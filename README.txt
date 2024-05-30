@@ -1,25 +1,4 @@
 
-### Milestone 1 Implementation Details:
-
-Only csim and a main file is part of the executable.
-
-
-
-
-### Milestone 2 Implementation Details:
-
-The simulator's cycle count isn't always accurate, and I think write-throughs might not be handled correctly.
-
-
-
-
-### Milestone 3 Implementation Details:
-
-When there is a cache miss, invalid/empty slots are identified by whether their load and access times are the same as their timestamps at initialization, 
--1, in this simulator, which is why its cache slots do not have a valid field. 
-
-
-
 ### Report on Best Cache Configuration:
 
     Based on simulation results, fully associative caches with write-allocate write-back caches had the best performance. Whether the cache is more 
