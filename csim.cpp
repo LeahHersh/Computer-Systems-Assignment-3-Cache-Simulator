@@ -1,9 +1,7 @@
 #include "csim.h"
-#include "csim.h"
 #include <stdio.h>
 #include <iostream>
 #include <string>
-
 
 
 /* Initialize the cache settings. */
